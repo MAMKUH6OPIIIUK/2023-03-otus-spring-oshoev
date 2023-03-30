@@ -37,8 +37,9 @@ public class TestingDaoCsv implements TestingDao {
     public TestingDaoCsv(String csvResourceName) throws IOException, IncorrectCsvFormatException {
         this.testingCache = new Testing("Java testing from CSV", new ArrayList<>());
         ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(csvResourceName);
-        readFromInputStream(inputStream);
+        try (InputStream inputStream = classLoader.getResourceAsStream(csvResourceName)) {
+            readFromInputStream(inputStream);
+        }
     }
 
     private void readFromInputStream(InputStream inputStream)

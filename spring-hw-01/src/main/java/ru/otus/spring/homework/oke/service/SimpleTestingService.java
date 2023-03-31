@@ -16,10 +16,13 @@ public class SimpleTestingService implements TestingService {
 
     private Integer passingScore;
 
-    public SimpleTestingService(TestingDao testingDao, String testingTheme, Integer passingScore) {
+    private IOService ioService;
+
+    public SimpleTestingService(TestingDao testingDao, String testingTheme, Integer passingScore, IOService ioService) {
         this.testingDao = testingDao;
         this.testingTheme = testingTheme;
         this.passingScore = passingScore;
+        this.ioService = ioService;
     }
 
     /**
@@ -35,7 +38,7 @@ public class SimpleTestingService implements TestingService {
         List<Testing> testings = this.testingDao.findAll();
         Testing testing = this.chooseTesting(testings);
         if (testing == null) {
-            System.out.println("Sorry. Testing not found");
+            this.ioService.printLine("Sorry. Testing not found");
             return false;
         }
 
@@ -49,30 +52,30 @@ public class SimpleTestingService implements TestingService {
             totalResult += studentAnswer.getScore();
         }
         if (totalResult >= this.passingScore || totalResult >= testing.getMaxScore()) {
-            System.out.println("Congratulations, the test has passed successfully. Your score: " + totalResult);
+            this.ioService.printLine("Congratulations, the test has passed successfully. Your score: " + totalResult);
             return true;
         } else {
-            System.out.println("Sorry, you didn't pass the test. try later");
+            this.ioService.printLine("Sorry, you didn't pass the test. try later");
             return false;
         }
     }
 
     private void printHeader(Testing testing) {
-        System.out.println("Attention! Testing begins");
-        System.out.println("The test contains " + testing.getQuestions().size()
+        this.ioService.printLine("Attention! Testing begins");
+        this.ioService.printLine("The test contains " + testing.getQuestions().size()
                 + " questions.");
-        System.out.println("Maximum Points: " + testing.getMaxScore());
+        this.ioService.printLine("Maximum Points: " + testing.getMaxScore());
     }
 
     private void printQuestion(int questionNumber, Question question) {
-        System.out.println("Question #" + questionNumber + ": " + question.getQuestionText());
+        this.ioService.printLine("Question #" + questionNumber + ": " + question.getQuestionText());
         if (question.getQuestionType().equals(QuestionType.SELECT_ONE)) {
-            System.out.println("Copy and paste the text of one of the suggested answers:");
+            this.ioService.printLine("Copy and paste the text of one of the suggested answers:");
             for (Answer answer : question.getAnswers()) {
-                System.out.println(answer.getAnswerText());
+                this.ioService.printLine(answer.getAnswerText());
             }
         } else {
-            System.out.println("Enter your answer");
+            this.ioService.printLine("Enter your answer");
         }
     }
 
@@ -83,7 +86,7 @@ public class SimpleTestingService implements TestingService {
      */
     private Answer readStudentAnswer(Question question) {
         Answer answer = question.getAnswerWithMaxScore();
-        System.out.println("Student entered answer: " + answer.getAnswerText());
+        this.ioService.printLine("Student entered answer: " + answer.getAnswerText());
         return answer;
     }
 

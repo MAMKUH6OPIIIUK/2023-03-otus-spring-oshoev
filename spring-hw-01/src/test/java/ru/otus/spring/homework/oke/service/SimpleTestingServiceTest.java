@@ -12,7 +12,7 @@ import ru.otus.spring.homework.oke.domain.QuestionType;
 import ru.otus.spring.homework.oke.domain.Testing;
 
 import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -24,13 +24,16 @@ public class SimpleTestingServiceTest {
     @Mock
     TestingDao testingDao;
 
+    OutputStream output = new ByteArrayOutputStream();
+
     SimpleTestingService testingService;
 
     @BeforeEach
     public void init() {
         String themeName = "Test theme";
         Integer passingScore = 10;
-        testingService = new SimpleTestingService(testingDao, themeName, passingScore);
+        IOService ioService = new IOServiceCLI(System.in, output);
+        testingService = new SimpleTestingService(testingDao, themeName, passingScore, ioService);
     }
 
     /**
@@ -41,9 +44,6 @@ public class SimpleTestingServiceTest {
      */
     @Test
     public void test_executeStudentTesting_With_Question_Then_Testing_Passed() {
-        final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(myOut));
-
         String themeName = "Test theme";
 
         Answer answer1 = new Answer("C++", 0);
@@ -61,13 +61,11 @@ public class SimpleTestingServiceTest {
         boolean result = testingService.executeStudentTesting();
 
         assertTrue(result);
-        assertTrue(myOut.toString().contains("Your score: 15"));
+        assertTrue(output.toString().contains("Your score: 15"));
     }
 
     @Test
     public void test_executeStudentTesting_When_Theme_Not_Exists_Then_Not_Passed() {
-        final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(myOut));
         String themeName = "Test theme2";
 
         Answer answer1 = new Answer("C++", 0);
@@ -85,6 +83,6 @@ public class SimpleTestingServiceTest {
         boolean result = testingService.executeStudentTesting();
 
         assertFalse(result);
-        assertTrue(myOut.toString().contains("Sorry. Testing not found"));
+        assertTrue(output.toString().contains("Sorry. Testing not found"));
     }
 }

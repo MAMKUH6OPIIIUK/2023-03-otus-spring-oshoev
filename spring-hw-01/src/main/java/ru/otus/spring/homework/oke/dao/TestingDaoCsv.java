@@ -30,7 +30,7 @@ public class TestingDaoCsv implements TestingDao {
      *
      * @param csvResourceName имя ресурса внутри jar
      */
-    public TestingDaoCsv(String csvResourceName) throws IOException, IncorrectCsvFormatException {
+    public TestingDaoCsv(String csvResourceName) {
         this.csvResourceName = csvResourceName;
     }
 
@@ -49,22 +49,18 @@ public class TestingDaoCsv implements TestingDao {
                 readFromInputStream(inputStream, result);
                 return result;
             } else {
-                /*TODO
-                  потом можно добавить логирование этой ситуации: ресурс не найден
-                */
-                return result;
+                throw new IncorrectCsvFormatException("CSV resource not found");
             }
-        } catch (IncorrectCsvFormatException | IOException e) {
-            /* TODO
-               потом можно добавить логирование этой ситуации: ошибка при чтении ресурса
-            */
-            result.clear();
-            return result;
+        } catch (IncorrectCsvFormatException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new IncorrectCsvFormatException("Unknown error loading CSV resource: "
+                    + e.getClass().getName() + e.getMessage());
         }
     }
 
     /**
-     * Метод загружает SVC-ресурс из InputStream и читает его построчно
+     * Метод загружает CSV-ресурс из InputStream и читает его построчно
      *
      * @param inputStream InputStream читаемого CSV-ресурса
      * @param testings    список тестирований с вопросами по темам, который будет наполнен в результате работы метода
@@ -73,7 +69,7 @@ public class TestingDaoCsv implements TestingDao {
      *                                     См. {@link #parseLineAndSave(String[], List)}
      */
     private void readFromInputStream(InputStream inputStream, List<Testing> testings)
-            throws IOException, IncorrectCsvFormatException {
+            throws IOException {
         CSVParser parser = initParser();
         try (Reader reader
                      = new BufferedReader(new InputStreamReader(inputStream))) {
@@ -101,7 +97,7 @@ public class TestingDaoCsv implements TestingDao {
      * @throws IncorrectCsvFormatException если тип вопроса не является допустимым значением, либо балл за ответ
      *                                     не является числом
      */
-    private void parseLineAndSave(String[] line, List<Testing> testings) throws IncorrectCsvFormatException {
+    private void parseLineAndSave(String[] line, List<Testing> testings) {
         if (line.length != 5) {
             throw new IncorrectCsvFormatException("Q&A CSV resource must contain 5 columns");
         }
@@ -141,14 +137,14 @@ public class TestingDaoCsv implements TestingDao {
      * @param testing тестирование, к которому будет добавлен новый вопрос
      * @throws IncorrectCsvFormatException См. {@link #parseLineAndSave(String[], List)}
      */
-    private void saveNewQuestion(String[] line, Testing testing) throws IncorrectCsvFormatException {
+    private void saveNewQuestion(String[] line, Testing testing) {
         try {
             Answer newAnswerForQuestion = new Answer(line[3], Integer.valueOf(line[4]));
             List<Answer> newAnswers = new ArrayList<>();
             newAnswers.add(newAnswerForQuestion);
             testing.getQuestions().add(new Question(line[2], line[1], newAnswers));
         } catch (Throwable e) {
-            this.handleException(e);
+            this.handleFormatException(e);
         }
     }
 
@@ -157,10 +153,10 @@ public class TestingDaoCsv implements TestingDao {
      * из строки ещё нет
      *
      * @param savedQuestion вопрос, к списку вариантов ответа на который, будет добавлен новый вариант из CSV строки
-     * @param line строка из CSV файла
+     * @param line          строка из CSV файла
      * @throws IncorrectCsvFormatException См. {@link #parseLineAndSave(String[], List)}
      */
-    private void updateSavedQuestion(Question savedQuestion, String[] line) throws IncorrectCsvFormatException {
+    private void updateSavedQuestion(Question savedQuestion, String[] line) {
         Answer savedAnswer = savedQuestion.getAnswerByText(line[3]);
         if (savedAnswer != null) {
             return;
@@ -169,12 +165,12 @@ public class TestingDaoCsv implements TestingDao {
                 Answer newAnswerForQuestion = new Answer(line[3], Integer.valueOf(line[4]));
                 savedQuestion.getAnswers().add(newAnswerForQuestion);
             } catch (Throwable e) {
-                this.handleException(e);
+                this.handleFormatException(e);
             }
         }
     }
 
-    private void handleException(Throwable e) throws IncorrectCsvFormatException {
+    private void handleFormatException(Throwable e) {
         if (e instanceof NumberFormatException) {
             throw new IncorrectCsvFormatException("Column 4 must be integer");
         } else if (e instanceof IllegalArgumentException) {

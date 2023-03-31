@@ -8,6 +8,5 @@ public class Main {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/spring-context.xml");
         TestingService testingService = context.getBean(TestingService.class);
         testingService.executeStudentTesting();
-        context.close();
     }
 }

@@ -6,12 +6,20 @@ import ru.otus.spring.homework.oke.domain.Question;
 import ru.otus.spring.homework.oke.domain.QuestionType;
 import ru.otus.spring.homework.oke.domain.Testing;
 
+import java.util.List;
+
 
 public class SimpleTestingService implements TestingService {
     private TestingDao testingDao;
 
-    public void setTestingDao(TestingDao testingDao) {
+    private String testingTheme;
+
+    private Integer passingScore;
+
+    public SimpleTestingService(TestingDao testingDao, String testingTheme, Integer passingScore) {
         this.testingDao = testingDao;
+        this.testingTheme = testingTheme;
+        this.passingScore = passingScore;
     }
 
     /**
@@ -20,18 +28,17 @@ public class SimpleTestingService implements TestingService {
      * как вопрос с выбором одного из доступных вариантов), определяет наилучший возможный ответ на
      * вопрос и печатает его.
      *
-     * @param themeName    имя темы тестирования. Должно иметь фиксированное значение "Java testing from CSV"
-     * @param passingScore количество баллов, необходимых для прохождения теста. При проверке результата сверху
-     *                     ограничивается максимальным количеством баллов за тест
      * @return true, если студент прошел тестирование. В данной реализации всегда будет это значение
      */
     @Override
-    public boolean executeStudentTesting(String themeName, Integer passingScore) {
-        Testing testing = this.testingDao.findByThemeName(themeName);
+    public boolean executeStudentTesting() {
+        List<Testing> testings = this.testingDao.findAll();
+        Testing testing = this.chooseTesting(testings);
         if (testing == null) {
-            System.out.println("Testing not found");
+            System.out.println("Sorry. Testing not found");
             return false;
         }
+
         this.printHeader(testing);
 
         int totalResult = 0;
@@ -41,7 +48,7 @@ public class SimpleTestingService implements TestingService {
             Answer studentAnswer = readStudentAnswer(currentQuestion);
             totalResult += studentAnswer.getScore();
         }
-        if (totalResult >= passingScore || totalResult >= testing.getMaxScore()) {
+        if (totalResult >= this.passingScore || totalResult >= testing.getMaxScore()) {
             System.out.println("Congratulations, the test has passed successfully. Your score: " + totalResult);
             return true;
         } else {
@@ -78,6 +85,15 @@ public class SimpleTestingService implements TestingService {
         Answer answer = question.getAnswerWithMaxScore();
         System.out.println("Student entered answer: " + answer.getAnswerText());
         return answer;
+    }
+
+    private Testing chooseTesting(List<Testing> testings) {
+        for (Testing testing : testings) {
+            if (testing.getThemeName().equalsIgnoreCase(this.testingTheme)) {
+                return testing;
+            }
+        }
+        return null;
     }
 
 }

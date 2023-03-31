@@ -8,7 +8,9 @@
     </bean>
 
     <bean id="testingService" class="ru.otus.spring.homework.oke.service.SimpleTestingService">
-        <property name="testingDao" ref="testingDao" />
+        <constructor-arg index="0" ref="testingDao" />
+        <constructor-arg index="1" value="Java testing from CSV" />
+        <constructor-arg index="2" value="50" />
     </bean>
 
 </beans>

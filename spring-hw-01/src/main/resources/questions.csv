@@ -1,17 +1,17 @@
-select_one,Which is the way in which a thread can enter the waiting state?,Invoke its sleep() method,3
-select_one,Which is the way in which a thread can enter the waiting state?,Invoke object's wait method,3
-select_one,Which is the way in which a thread can enter the waiting state?,Invoke its suspend method,3
-select_one,Which is the way in which a thread can enter the waiting state?,All of the above,10
-select_one,Static binding uses which information for binding?,type,10
-select_one,Static binding uses which information for binding?,object,0
-select_one,Static binding uses which information for binding?,Both of the above,0
-select_one,Static binding uses which information for binding?,None of the above,0
-select_one,What of the following is the default value of a local variable?,null,0
-select_one,What of the following is the default value of a local variable?,0,0
-select_one,What of the following is the default value of a local variable?,Depends upon the type of variable,0
-select_one,What of the following is the default value of a local variable?,Not assigned,10
-select_one,What is Serialization?,Serialization is the process of writing the state of an object to another object,0
-select_one,What is Serialization?,Serialization is the process of writing the state of an object to a byte stream.,10
-select_one,What is Serialization?,Both of the above,0
-select_one,What is Serialization?,None of the above,0
-free,What is the default value of long variable?,0L,10
+Java testing from CSV,select_one,Which is the way in which a thread can enter the waiting state?,Invoke its sleep() method,3
+Java testing from CSV,select_one,Which is the way in which a thread can enter the waiting state?,Invoke object's wait method,3
+Java testing from CSV,select_one,Which is the way in which a thread can enter the waiting state?,Invoke its suspend method,3
+Java testing from CSV,select_one,Which is the way in which a thread can enter the waiting state?,All of the above,10
+Java testing from CSV,select_one,Static binding uses which information for binding?,type,10
+Java testing from CSV,select_one,Static binding uses which information for binding?,object,0
+Java testing from CSV,select_one,Static binding uses which information for binding?,Both of the above,0
+Java testing from CSV,select_one,Static binding uses which information for binding?,None of the above,0
+Java testing from CSV,select_one,What of the following is the default value of a local variable?,null,0
+Java testing from CSV,select_one,What of the following is the default value of a local variable?,0,0
+Java testing from CSV,select_one,What of the following is the default value of a local variable?,Depends upon the type of variable,0
+Java testing from CSV,select_one,What of the following is the default value of a local variable?,Not assigned,10
+Java testing from CSV,select_one,What is Serialization?,Serialization is the process of writing the state of an object to another object,0
+Java testing from CSV,select_one,What is Serialization?,Serialization is the process of writing the state of an object to a byte stream.,10
+Java testing from CSV,select_one,What is Serialization?,Both of the above,0
+Java testing from CSV,select_one,What is Serialization?,None of the above,0
+Java testing from CSV,free,What is the default value of long variable?,0L,10

@@ -6,7 +6,4 @@ import java.util.List;
 
 public interface TestingDao {
     List<Testing> findAll();
-
-    Testing findByThemeName(String themeName);
-
 }

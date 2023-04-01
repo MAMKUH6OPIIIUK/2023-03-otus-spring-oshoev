@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="testingDao" class="ru.otus.spring.homework.oke.dao.TestingDaoCsv">
+        <constructor-arg index="0" value="questions.csv" />
+    </bean>
+
+    <bean id="ioService" class="ru.otus.spring.homework.oke.service.IOServiceCLI">
+        <constructor-arg index="0" value="#{T(System).in}"/>
+        <constructor-arg index="1" value="#{T(System).out}"/>
+    </bean>
+
+    <bean id="testingService" class="ru.otus.spring.homework.oke.service.SimpleTestingService">
+        <constructor-arg index="0" ref="testingDao" />
+        <constructor-arg index="1" value="Java testing from CSV" />
+        <constructor-arg index="2" value="50" />
+        <constructor-arg index="3" ref="ioService" />
+    </bean>
+
+</beans>

@@ -51,11 +51,9 @@ public class TestingDaoCsv implements TestingDao {
             } else {
                 throw new IncorrectCsvFormatException("CSV resource not found");
             }
-        } catch (IncorrectCsvFormatException e) {
-            throw e;
-        } catch (Throwable e) {
-            throw new IncorrectCsvFormatException("Unknown error loading CSV resource: "
-                    + e.getClass().getName() + e.getMessage());
+        } catch (IOException e) {
+            throw new IncorrectCsvFormatException("Unknown error reading CSV resource: "
+                    + e.getClass().getName() + " - " + e.getMessage());
         }
     }
 
@@ -143,8 +141,10 @@ public class TestingDaoCsv implements TestingDao {
             List<Answer> newAnswers = new ArrayList<>();
             newAnswers.add(newAnswerForQuestion);
             testing.getQuestions().add(new Question(line[2], line[1], newAnswers));
-        } catch (Throwable e) {
-            this.handleFormatException(e);
+        } catch (NumberFormatException e) {
+            throw new IncorrectCsvFormatException("Column 4 must be integer");
+        } catch (IllegalArgumentException e) {
+            throw new IncorrectCsvFormatException("Column 1: " + e.getMessage());
         }
     }
 
@@ -164,19 +164,9 @@ public class TestingDaoCsv implements TestingDao {
             try {
                 Answer newAnswerForQuestion = new Answer(line[3], Integer.valueOf(line[4]));
                 savedQuestion.getAnswers().add(newAnswerForQuestion);
-            } catch (Throwable e) {
-                this.handleFormatException(e);
+            } catch (NumberFormatException e) {
+                throw new IncorrectCsvFormatException("Column 4 must be integer");
             }
-        }
-    }
-
-    private void handleFormatException(Throwable e) {
-        if (e instanceof NumberFormatException) {
-            throw new IncorrectCsvFormatException("Column 4 must be integer");
-        } else if (e instanceof IllegalArgumentException) {
-            throw new IncorrectCsvFormatException("Column 1: " + e.getMessage());
-        } else {
-            throw new IncorrectCsvFormatException("Unknown error..");
         }
     }
 

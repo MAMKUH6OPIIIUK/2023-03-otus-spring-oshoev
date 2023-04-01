@@ -38,7 +38,7 @@ public class TestingDaoCsv implements TestingDao {
      * Метод читает CSV конфигурацию вопросов тестирований
      *
      * @return список сконфигурированных тестирований, если CSV-ресурс имеет корректный формат строк
-     * и его удалось прочитать, либо пустой список
+     * и его удалось прочитать, либо исключение IncorrectCsvFormatException
      */
     @Override
     public List<Testing> findAll() {

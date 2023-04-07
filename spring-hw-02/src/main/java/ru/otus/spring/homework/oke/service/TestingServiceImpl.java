@@ -47,7 +47,7 @@ public class TestingServiceImpl implements TestingService {
      * как вопрос с выбором одного из доступных вариантов), определяет наилучший возможный ответ на
      * вопрос и печатает его.
      *
-     * @return true, если студент прошел тестирование. В данной реализации всегда будет это значение
+     * @return true, если студент прошел тестирование
      */
     @Override
     public boolean executeStudentTesting() {
@@ -89,9 +89,7 @@ public class TestingServiceImpl implements TestingService {
             for (Answer answer : question.getAnswers()) {
                 this.ioService.outputString(answer.getAnswerText());
             }
-        } /*else {
-            this.ioService.outputString("Enter your answer");
-        }*/
+        }
     }
 
     /**

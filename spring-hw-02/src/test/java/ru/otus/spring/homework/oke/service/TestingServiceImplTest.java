@@ -120,14 +120,14 @@ public class TestingServiceImplTest {
     public void shouldPerformStudentTestAndNotifyThatTestingFailedIfWrongAnswers() {
         String themeName = "Test theme";
         Testing testing = generateTestingData(themeName);
-        String correctSelectableAnswer = "C++";
+        String incorrectSelectableAnswer = "C++";
         String incorrectFreeAnswer = "Черный плащ";
         Integer expectedScore = 0;
 
         given(testingDao.findAll()).willReturn(Arrays.asList(testing));
         given(ioService.readStringWithPrompt(any())).willReturn(new String());
         given(ioService.readStringWithPrompt(TestingServiceImpl.SELECT_ONE_ANSWER_PROMPT))
-                .willReturn(correctSelectableAnswer);
+                .willReturn(incorrectSelectableAnswer);
         given(ioService.readStringWithPrompt(TestingServiceImpl.FREE_ANSWER_PROMPT))
                 .willReturn(incorrectFreeAnswer);
 

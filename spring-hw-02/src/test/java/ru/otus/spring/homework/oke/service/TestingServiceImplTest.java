@@ -48,19 +48,19 @@ public class TestingServiceImplTest {
         Question expectedQuestion2 = expectedQuestions.get(1);
 
         given(testingDao.findAll()).willReturn(Arrays.asList(testing));
-        given(ioService.readStringWithPrompt(any())).willReturn(new String());
-        given(ioService.readStringWithPrompt(TestingServiceImpl.SELECT_ONE_ANSWER_PROMPT)).willReturn("Perl");
+        given(ioService.readLineWithPrompt(any())).willReturn(new String());
+        given(ioService.readLineWithPrompt(TestingServiceImpl.SELECT_ONE_ANSWER_PROMPT)).willReturn("Perl");
 
         testingService.executeStudentTesting();
 
-        verify(ioService, times(1)).readStringWithPrompt(
+        verify(ioService, times(1)).readLineWithPrompt(
                 TestingServiceImpl.STUDENT_NAME_PROMPT);
-        verify(ioService, times(1)).readStringWithPrompt(
+        verify(ioService, times(1)).readLineWithPrompt(
                 TestingServiceImpl.STUDENT_SURNAME_PROMPT);
-        verify(ioService, times(expectedQuestions.size())).outputString(contains("Question #"));
-        verify(ioService, times(1)).outputString(contains(expectedQuestion1.getQuestionText()));
-        verify(ioService, times(1)).outputString(contains(expectedQuestion2.getQuestionText()));
-        verify(ioService, times(1)).outputString(matches(".*Your score: [0-9]+.*"));
+        verify(ioService, times(expectedQuestions.size())).printLine(contains("Question #"));
+        verify(ioService, times(1)).printLine(contains(expectedQuestion1.getQuestionText()));
+        verify(ioService, times(1)).printLine(contains(expectedQuestion2.getQuestionText()));
+        verify(ioService, times(1)).printLine(matches(".*Your score: [0-9]+.*"));
     }
 
     @DisplayName(" должен при получении правильных ответов на все вопросы через IOService поздравить студента " +
@@ -75,18 +75,18 @@ public class TestingServiceImplTest {
         Integer expectedScore = testing.getMaxScore();
 
         given(testingDao.findAll()).willReturn(Arrays.asList(testing));
-        given(ioService.readStringWithPrompt(any())).willReturn(new String());
-        given(ioService.readStringWithPrompt(TestingServiceImpl.STUDENT_NAME_PROMPT)).willReturn(expectedName);
-        given(ioService.readStringWithPrompt(TestingServiceImpl.SELECT_ONE_ANSWER_PROMPT))
+        given(ioService.readLineWithPrompt(any())).willReturn(new String());
+        given(ioService.readLineWithPrompt(TestingServiceImpl.STUDENT_NAME_PROMPT)).willReturn(expectedName);
+        given(ioService.readLineWithPrompt(TestingServiceImpl.SELECT_ONE_ANSWER_PROMPT))
                 .willReturn(correctSelectableAnswer);
-        given(ioService.readStringWithPrompt(TestingServiceImpl.FREE_ANSWER_PROMPT))
+        given(ioService.readLineWithPrompt(TestingServiceImpl.FREE_ANSWER_PROMPT))
                 .willReturn(correctFreeAnswer);
 
         boolean testingResult = testingService.executeStudentTesting();
 
         assertThat(testingResult).isEqualTo(true);
-        verify(ioService, times(1)).outputString(contains(expectedName + "! Congratulations"));
-        verify(ioService, times(1)).outputString(contains("Your score: " + expectedScore));
+        verify(ioService, times(1)).printLine(contains(expectedName + "! Congratulations"));
+        verify(ioService, times(1)).printLine(contains("Your score: " + expectedScore));
     }
 
     @DisplayName(" должен при получении правильных ответов в количестве, достаточном для прохождения теста, " +
@@ -101,18 +101,18 @@ public class TestingServiceImplTest {
         Integer expectedScore = 10;
 
         given(testingDao.findAll()).willReturn(Arrays.asList(testing));
-        given(ioService.readStringWithPrompt(any())).willReturn(new String());
-        given(ioService.readStringWithPrompt(TestingServiceImpl.STUDENT_NAME_PROMPT)).willReturn(expectedName);
-        given(ioService.readStringWithPrompt(TestingServiceImpl.SELECT_ONE_ANSWER_PROMPT))
+        given(ioService.readLineWithPrompt(any())).willReturn(new String());
+        given(ioService.readLineWithPrompt(TestingServiceImpl.STUDENT_NAME_PROMPT)).willReturn(expectedName);
+        given(ioService.readLineWithPrompt(TestingServiceImpl.SELECT_ONE_ANSWER_PROMPT))
                 .willReturn(correctSelectableAnswer);
-        given(ioService.readStringWithPrompt(TestingServiceImpl.FREE_ANSWER_PROMPT))
+        given(ioService.readLineWithPrompt(TestingServiceImpl.FREE_ANSWER_PROMPT))
                 .willReturn(incorrectFreeAnswer);
 
         boolean testingResult = testingService.executeStudentTesting();
 
         assertThat(testingResult).isEqualTo(true);
-        verify(ioService, times(1)).outputString(contains(expectedName + "! Congratulations"));
-        verify(ioService, times(1)).outputString(contains("Your score: " + expectedScore));
+        verify(ioService, times(1)).printLine(contains(expectedName + "! Congratulations"));
+        verify(ioService, times(1)).printLine(contains("Your score: " + expectedScore));
     }
 
     @DisplayName(" должен не засчитать успешность тестирования, если не набран проходной балл")
@@ -125,17 +125,17 @@ public class TestingServiceImplTest {
         Integer expectedScore = 0;
 
         given(testingDao.findAll()).willReturn(Arrays.asList(testing));
-        given(ioService.readStringWithPrompt(any())).willReturn(new String());
-        given(ioService.readStringWithPrompt(TestingServiceImpl.SELECT_ONE_ANSWER_PROMPT))
+        given(ioService.readLineWithPrompt(any())).willReturn(new String());
+        given(ioService.readLineWithPrompt(TestingServiceImpl.SELECT_ONE_ANSWER_PROMPT))
                 .willReturn(incorrectSelectableAnswer);
-        given(ioService.readStringWithPrompt(TestingServiceImpl.FREE_ANSWER_PROMPT))
+        given(ioService.readLineWithPrompt(TestingServiceImpl.FREE_ANSWER_PROMPT))
                 .willReturn(incorrectFreeAnswer);
 
         boolean testingResult = testingService.executeStudentTesting();
 
         assertThat(testingResult).isEqualTo(false);
-        verify(ioService, times(1)).outputString(contains("Sorry, you didn't pass the test"));
-        verify(ioService, times(1)).outputString(contains("Your score: " + expectedScore));
+        verify(ioService, times(1)).printLine(contains("Sorry, you didn't pass the test"));
+        verify(ioService, times(1)).printLine(contains("Your score: " + expectedScore));
     }
 
     @DisplayName(" должен сообщить, что тестирование по теме не найдено, если вопросов по теме не получено от дао")
@@ -149,7 +149,7 @@ public class TestingServiceImplTest {
         boolean testingResult = testingService.executeStudentTesting();
 
         assertThat(testingResult).isEqualTo(false);
-        verify(ioService, times(1)).outputString(contains("Sorry. Testing not found"));
+        verify(ioService, times(1)).printLine(contains("Sorry. Testing not found"));
     }
 
     private static Testing generateTestingData(String themeName) {

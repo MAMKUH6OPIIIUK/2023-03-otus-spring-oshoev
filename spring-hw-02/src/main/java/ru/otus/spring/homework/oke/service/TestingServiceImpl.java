@@ -1,6 +1,5 @@
 package ru.otus.spring.homework.oke.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.otus.spring.homework.oke.dao.TestingDao;
@@ -22,15 +21,14 @@ public class TestingServiceImpl implements TestingService {
 
     public static final String STUDENT_SURNAME_PROMPT = "Enter your surname";
 
-    private TestingDao testingDao;
+    private final TestingDao testingDao;
 
-    private String testingTheme;
+    private final String testingTheme;
 
-    private Integer passingScore;
+    private final Integer passingScore;
 
-    private IOService ioService;
+    private final IOService ioService;
 
-    @Autowired
     public TestingServiceImpl(TestingDao testingDao,
                               @Value("${testing.service.theme}") String testingTheme,
                               @Value("${testing.service.passingScore}") Integer passingScore,
@@ -57,7 +55,7 @@ public class TestingServiceImpl implements TestingService {
         List<Testing> testings = this.testingDao.findAll();
         Testing testing = this.chooseTesting(testings);
         if (testing == null) {
-            this.ioService.outputString("Sorry. Testing not found");
+            this.ioService.printLine("Sorry. Testing not found");
             return false;
         }
         this.printHeader(testing);
@@ -73,24 +71,24 @@ public class TestingServiceImpl implements TestingService {
     }
 
     private void printHeader(Testing testing) {
-        this.ioService.outputString("Attention! Testing begins");
-        this.ioService.outputString("The test contains " + testing.getQuestions().size()
+        this.ioService.printLine("Attention! Testing begins");
+        this.ioService.printLine("The test contains " + testing.getQuestions().size()
                 + " questions.");
-        this.ioService.outputString("Maximum Points: " + testing.getMaxScore());
+        this.ioService.printLine("Maximum Points: " + testing.getMaxScore());
     }
 
     private Student askStudentFullName() {
-        String name = this.ioService.readStringWithPrompt(STUDENT_NAME_PROMPT);
-        String surname = this.ioService.readStringWithPrompt(STUDENT_SURNAME_PROMPT);
+        String name = this.ioService.readLineWithPrompt(STUDENT_NAME_PROMPT);
+        String surname = this.ioService.readLineWithPrompt(STUDENT_SURNAME_PROMPT);
         return new Student(name,surname);
     }
 
     private void printQuestion(int questionNumber, Question question) {
-        this.ioService.outputString("Question #" + questionNumber + ": " + question.getQuestionText());
+        this.ioService.printLine("Question #" + questionNumber + ": " + question.getQuestionText());
         if (question.getQuestionType().equals(QuestionType.SELECT_ONE)) {
-            this.ioService.outputString("Suggested answers:");
+            this.ioService.printLine("Suggested answers:");
             for (Answer answer : question.getAnswers()) {
-                this.ioService.outputString(answer.getAnswerText());
+                this.ioService.printLine(answer.getAnswerText());
             }
         }
     }
@@ -115,14 +113,14 @@ public class TestingServiceImpl implements TestingService {
     private Answer readSelectingAnswer(Question question) {
         Answer studentAnswer = null;
         while (studentAnswer == null) {
-            String studentAnswerText = this.ioService.readStringWithPrompt(SELECT_ONE_ANSWER_PROMPT);
+            String studentAnswerText = this.ioService.readLineWithPrompt(SELECT_ONE_ANSWER_PROMPT);
             studentAnswer = question.getAnswerByText(studentAnswerText);
         }
         return studentAnswer;
     }
 
     private Answer readFreeAnswer(Question question) {
-        String studentAnswerText = this.ioService.readStringWithPrompt(FREE_ANSWER_PROMPT);
+        String studentAnswerText = this.ioService.readLineWithPrompt(FREE_ANSWER_PROMPT);
         Answer foundAnswer = question.getAnswerByText(studentAnswerText);
         if (foundAnswer != null) {
             return foundAnswer;
@@ -141,11 +139,11 @@ public class TestingServiceImpl implements TestingService {
 
     private boolean calculateTestingResult(Testing testing, Student student, int studentScore) {
         if (studentScore >= this.passingScore || studentScore >= testing.getMaxScore()) {
-            this.ioService.outputString("Dear " + student.getName() + "! Congratulations, the test has passed " +
+            this.ioService.printLine("Dear " + student.getName() + "! Congratulations, the test has passed " +
                     "successfully. Your score: " + studentScore);
             return true;
         } else {
-            this.ioService.outputString("Sorry, you didn't pass the test. Your score: " + studentScore
+            this.ioService.printLine("Sorry, you didn't pass the test. Your score: " + studentScore
                     + ". Try later");
             return false;
         }

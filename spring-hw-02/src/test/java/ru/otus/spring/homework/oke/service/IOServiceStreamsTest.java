@@ -35,7 +35,7 @@ public class IOServiceStreamsTest {
         String expectedPrompt = "Say hello";
         String expectedString = "Hello world!";
 
-        String resultString = ioService.readStringWithPrompt(expectedPrompt);
+        String resultString = ioService.readLineWithPrompt(expectedPrompt);
 
         assertThat(resultString).isEqualTo(expectedString);
         assertThat(output.toString().trim()).isEqualTo(expectedPrompt);
@@ -46,7 +46,7 @@ public class IOServiceStreamsTest {
     public void correctOutputString() {
         String expectedString = "Hello world!";
 
-        ioService.outputString(expectedString);
+        ioService.printLine(expectedString);
 
         assertThat(output.toString().trim()).isEqualTo(expectedString);
     }

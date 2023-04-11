@@ -28,7 +28,7 @@ public class IOServiceStreamsTest {
         ioService = new IOServiceStreams(input, output);
     }
 
-    @DisplayName(" при вызове метода readStringWithPrompt должен записывать в output stream " +
+    @DisplayName(" при вызове метода readLineWithPrompt должен записывать в output stream " +
             "приглашение без изменений и корректно читать из input stream строку")
     @Test
     public void correctReadLineWithPrompt() {
@@ -41,7 +41,7 @@ public class IOServiceStreamsTest {
         assertThat(output.toString().trim()).isEqualTo(expectedPrompt);
     }
 
-    @DisplayName(" при вызове метода outputString должен корректно записывать в output stream полученную строку")
+    @DisplayName(" при вызове метода printLine должен корректно записывать в output stream полученную строку")
     @Test
     public void correctPrintLine() {
         String expectedLine = "Hello world!";

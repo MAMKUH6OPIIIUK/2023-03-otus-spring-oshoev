@@ -24,7 +24,6 @@ public class IOServiceStreams implements IOService {
         this.output = new PrintStream(outputStream);
     }
 
-
     @Override
     public String readLineWithPrompt(String prompt) {
         printLine(prompt);

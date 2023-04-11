@@ -31,23 +31,23 @@ public class IOServiceStreamsTest {
     @DisplayName(" при вызове метода readStringWithPrompt должен записывать в output stream " +
             "приглашение без изменений и корректно читать из input stream строку")
     @Test
-    public void correctReadStringWithPrompt() {
+    public void correctReadLineWithPrompt() {
         String expectedPrompt = "Say hello";
-        String expectedString = "Hello world!";
+        String expectedLine = "Hello world!";
 
         String resultString = ioService.readLineWithPrompt(expectedPrompt);
 
-        assertThat(resultString).isEqualTo(expectedString);
+        assertThat(resultString).isEqualTo(expectedLine);
         assertThat(output.toString().trim()).isEqualTo(expectedPrompt);
     }
 
     @DisplayName(" при вызове метода outputString должен корректно записывать в output stream полученную строку")
     @Test
-    public void correctOutputString() {
-        String expectedString = "Hello world!";
+    public void correctPrintLine() {
+        String expectedLine = "Hello world!";
 
-        ioService.printLine(expectedString);
+        ioService.printLine(expectedLine);
 
-        assertThat(output.toString().trim()).isEqualTo(expectedString);
+        assertThat(output.toString().trim()).isEqualTo(expectedLine);
     }
 }

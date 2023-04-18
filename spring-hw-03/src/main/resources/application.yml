@@ -7,10 +7,10 @@ spring:
       enabled: ALWAYS
 
 testing:
+  locale: ru_RU
   dao:
-    csv: "questions.csv"
+    resource-basename: "questions"
+    encoding: "UTF-8"
   service:
     theme: "Java testing from CSV"
     passing-score: 40
-  localization:
-    locale: ru_RU

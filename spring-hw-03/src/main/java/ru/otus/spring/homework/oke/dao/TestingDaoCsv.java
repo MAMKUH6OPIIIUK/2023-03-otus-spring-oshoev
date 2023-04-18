@@ -5,18 +5,20 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import org.springframework.stereotype.Repository;
-import ru.otus.spring.homework.oke.config.TestingDaoProperties;
+import ru.otus.spring.homework.oke.config.TestingDaoPropertiesProvider;
 import ru.otus.spring.homework.oke.domain.Answer;
 import ru.otus.spring.homework.oke.domain.Question;
 import ru.otus.spring.homework.oke.domain.QuestionType;
 import ru.otus.spring.homework.oke.domain.Testing;
-import ru.otus.spring.homework.oke.service.TranslationService;
+import ru.otus.spring.homework.oke.service.LocalizeService;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,19 +29,29 @@ import java.util.List;
  */
 @Repository
 public class TestingDaoCsv implements TestingDao {
-    private final String csvResourceName;
+    private final URL localizedCsvResourceUrl;
 
-    private final TranslationService translationService;
+    private final LocalizeService localizeService;
+
+    private final Charset resourceEncoding;
 
     /**
-     * Конструктор дао
+     * Конструктор класса
      *
-     * @param testingDaoProperties настройки дао тестирования
-     * @param translationService   сервис получения локализованных текстов тем тестирования\вопросов\ответов
+     * @param testingDaoPropertiesProvider предоставляет доступ к настройкам dao
+     * @param localizeService              сервис локализации
      */
-    public TestingDaoCsv(TestingDaoProperties testingDaoProperties, TranslationService translationService) {
-        this.csvResourceName = testingDaoProperties.getCsv();
-        this.translationService = translationService;
+    public TestingDaoCsv(TestingDaoPropertiesProvider testingDaoPropertiesProvider,
+                         LocalizeService localizeService) {
+        this.resourceEncoding = testingDaoPropertiesProvider.getEncoding();
+        String csvResourceBasename = testingDaoPropertiesProvider.getTestingResourceBasename();
+        this.localizeService = localizeService;
+        String resourceFileFormat = "csv";
+        this.localizedCsvResourceUrl = localizeService.getResourceUrl(csvResourceBasename, resourceFileFormat);
+        if (localizedCsvResourceUrl == null) {
+            String errorMessage = this.localizeService.getMessage("error.csv.not-found");
+            throw new IncorrectCsvFormatException(errorMessage);
+        }
     }
 
     /**
@@ -51,18 +63,13 @@ public class TestingDaoCsv implements TestingDao {
     @Override
     public List<Testing> findAll() {
         List<Testing> result = new ArrayList<>();
-        ClassLoader classLoader = getClass().getClassLoader();
-        try (InputStream inputStream = classLoader.getResourceAsStream(this.csvResourceName)) {
-            if (inputStream != null) {
-                readFromInputStream(inputStream, result);
-                return result;
-            } else {
-                throw new IncorrectCsvFormatException(this.translationService.
-                        getTranslatedString("error.csv.not-found"));
-            }
+
+        try (InputStream inputStream = localizedCsvResourceUrl.openStream()) {
+            readFromInputStream(inputStream, result);
+            return result;
         } catch (IOException e) {
-            throw new IncorrectCsvFormatException(this.translationService.
-                    getTranslatedString("error.csv.unknown-error"), e);
+            throw new IncorrectCsvFormatException(this.localizeService.
+                    getMessage("error.csv.unknown-error"), e);
         }
     }
 
@@ -79,7 +86,7 @@ public class TestingDaoCsv implements TestingDao {
             throws IOException {
         CSVParser parser = initParser();
         try (Reader reader
-                     = new BufferedReader(new InputStreamReader(inputStream))) {
+                     = new BufferedReader(new InputStreamReader(inputStream, this.resourceEncoding))) {
             try (CSVReader csvReader = new CSVReaderBuilder(reader).withSkipLines(0).withCSVParser(parser).build()) {
                 String[] line;
                 while ((line = csvReader.readNext()) != null) {
@@ -87,27 +94,6 @@ public class TestingDaoCsv implements TestingDao {
                 }
             }
         }
-    }
-
-    /**
-     * Метод проходит по строке из csv-файла и копирует все элементы (столбцы), которые не являются кодами локализуемых
-     * текстовок, в новый массив, а для столбцов, являющихся кодом, определяет локализованный текст и сохраняет в новый
-     * массив его
-     *
-     * @param csvLine строка csv-файла. Все столбцы, требующие локализации, должны начинаться с текста testing.theme
-     * @return строка csv, в которой все коды локализуемых текстовок заменены на текст
-     */
-    private String[] translateLine(String[] csvLine) {
-        String[] translatedLine = new String[csvLine.length];
-        for (int i = 0; i < csvLine.length; i++) {
-            String tempColumn = csvLine[i];
-            if (tempColumn.startsWith("testing.theme")) {
-                translatedLine[i] = this.translationService.getTranslatedString(tempColumn);
-            } else {
-                translatedLine[i] = tempColumn;
-            }
-        }
-        return translatedLine;
     }
 
     /**
@@ -127,26 +113,25 @@ public class TestingDaoCsv implements TestingDao {
      */
     private void parseLineAndSave(String[] csvLine, List<Testing> testings) {
         if (csvLine.length != 5) {
-            throw new IncorrectCsvFormatException(this.translationService.
-                    getTranslatedString("error.csv.wrong-row-length"));
+            throw new IncorrectCsvFormatException(this.localizeService.
+                    getMessage("error.csv.wrong-row-length"));
         }
-        String[] translatedLine = this.translateLine(csvLine);
-        Testing savedTesting = getTestingByTheme(testings, translatedLine[0]);
+        Testing savedTesting = getTestingByTheme(testings, csvLine[0]);
         if (savedTesting == null) {
-            savedTesting = saveNewTesting(testings, translatedLine[0]);
+            savedTesting = saveNewTesting(testings, csvLine[0]);
         }
         QuestionType rowQuestionType;
         try {
-            rowQuestionType = QuestionType.fromString(translatedLine[1]);
+            rowQuestionType = QuestionType.fromString(csvLine[1]);
         } catch (IllegalArgumentException e) {
-            throw new IncorrectCsvFormatException(this.translationService
-                    .getTranslatedString("error.csv.wrong-question-type"));
+            throw new IncorrectCsvFormatException(this.localizeService
+                    .getMessage("error.csv.wrong-question-type"));
         }
-        Question existentQuestion = savedTesting.getQuestionByTypeAndText(rowQuestionType, translatedLine[2]);
+        Question existentQuestion = savedTesting.getQuestionByTypeAndText(rowQuestionType, csvLine[2]);
         if (existentQuestion != null) {
-            updateSavedQuestion(existentQuestion, translatedLine);
+            updateSavedQuestion(existentQuestion, csvLine);
         } else {
-            saveNewQuestion(savedTesting, translatedLine);
+            saveNewQuestion(savedTesting, csvLine);
         }
     }
 
@@ -194,11 +179,11 @@ public class TestingDaoCsv implements TestingDao {
             newAnswers.add(newAnswerForQuestion);
             testing.getQuestions().add(new Question(line[2], line[1], newAnswers));
         } catch (NumberFormatException e) {
-            throw new IncorrectCsvFormatException(this.translationService
-                    .getTranslatedString("error.csv.wrong-score"));
+            throw new IncorrectCsvFormatException(this.localizeService
+                    .getMessage("error.csv.wrong-score"));
         } catch (IllegalArgumentException e) {
-            throw new IncorrectCsvFormatException(this.translationService
-                    .getTranslatedString("error.csv.wrong-question-type"));
+            throw new IncorrectCsvFormatException(this.localizeService
+                    .getMessage("error.csv.wrong-question-type"));
         }
     }
 
@@ -219,8 +204,8 @@ public class TestingDaoCsv implements TestingDao {
                 Answer newAnswerForQuestion = new Answer(line[3], Integer.valueOf(line[4]));
                 savedQuestion.getAnswers().add(newAnswerForQuestion);
             } catch (NumberFormatException e) {
-                throw new IncorrectCsvFormatException(this.translationService
-                        .getTranslatedString("error.csv.wrong-score"));
+                throw new IncorrectCsvFormatException(this.localizeService
+                        .getMessage("error.csv.wrong-score"));
             }
         }
     }

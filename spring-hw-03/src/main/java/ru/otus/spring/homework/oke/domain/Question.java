@@ -1,43 +1,31 @@
 package ru.otus.spring.homework.oke.domain;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
+@RequiredArgsConstructor
+@Getter
+@EqualsAndHashCode
 public class Question {
-    private final String questionText;
+    private final String text;
 
-    private final QuestionType questionType;
+    private final QuestionType type;
 
     private final List<Answer> answers;
 
-    public Question(String questionText, QuestionType questionType, List<Answer> answers) {
-        this.questionText = questionText;
-        this.questionType = questionType;
+    public Question(String text, String type, List<Answer> answers) {
+        this.text = text;
+        this.type = QuestionType.fromString(type);
         this.answers = answers;
-    }
-
-    public Question(String questionText, String questionType, List<Answer> answers) {
-        this.questionText = questionText;
-        this.questionType = QuestionType.fromString(questionType);
-        this.answers = answers;
-    }
-
-    public String getQuestionText() {
-        return questionText;
-    }
-
-    public QuestionType getQuestionType() {
-        return questionType;
-    }
-
-    public List<Answer> getAnswers() {
-        return answers;
     }
 
     public Answer getAnswerByText(String answerText) {
         for (Answer answer : this.answers) {
-            if (answer.getAnswerText().equalsIgnoreCase(answerText)) {
+            if (answer.getText().equalsIgnoreCase(answerText)) {
                 return answer;
             }
         }
@@ -56,24 +44,5 @@ public class Question {
                 return 0;
             }
         }).get();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Question question = (Question) o;
-        return Objects.equals(questionText, question.questionText)
-                && questionType == question.questionType
-                && Objects.equals(answers, question.answers);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(questionText, questionType, answers);
     }
 }

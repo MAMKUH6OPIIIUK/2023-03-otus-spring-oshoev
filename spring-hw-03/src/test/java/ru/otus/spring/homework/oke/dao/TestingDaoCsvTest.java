@@ -8,36 +8,39 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import ru.otus.spring.homework.oke.config.TestingDaoProperties;
+import org.springframework.context.MessageSource;
+import ru.otus.spring.homework.oke.config.ApplicationPropertiesProvider;
 import ru.otus.spring.homework.oke.domain.Answer;
 import ru.otus.spring.homework.oke.domain.Question;
 import ru.otus.spring.homework.oke.domain.QuestionType;
 import ru.otus.spring.homework.oke.domain.Testing;
-import ru.otus.spring.homework.oke.service.TranslationService;
+import ru.otus.spring.homework.oke.service.LocalizeService;
+import ru.otus.spring.homework.oke.service.LocalizeServiceImpl;
 
-import java.util.Arrays;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 @DisplayName("Дао для работы с csv файлом с тестированиями ")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class TestingDaoCsvTest {
-
     @Mock
-    private TranslationService translationService;
+    private MessageSource messageSource;
 
     private TestingDao testingDao;
 
     @BeforeEach
     public void setUp() {
-        TestingDaoProperties properties = new TestingDaoProperties();
-        properties.setCsv("junit_questions.csv");
-
-        testingDao = new TestingDaoCsv(properties, translationService);
+        ApplicationPropertiesProvider propertiesProvider = new ApplicationPropertiesProvider();
+        Map<String, Object> daoProperties = new HashMap<>();
+        daoProperties.put(ApplicationPropertiesProvider.DAO_RESOURCE_PROPERTY, "junit_questions");
+        daoProperties.put(ApplicationPropertiesProvider.DAO_ENCODING_PROPERTY, "UTF-8");
+        propertiesProvider.setDao(daoProperties);
+        propertiesProvider.setLocale(new Locale("ru_RU"));
+        LocalizeService localizeService = new LocalizeServiceImpl(messageSource, propertiesProvider);
+        testingDao = new TestingDaoCsv(propertiesProvider, localizeService);
     }
 
     @DisplayName("должен возвращать список тестирований с 1 тестированием, содержащим все локализованные вопросы из csv")
@@ -57,14 +60,6 @@ public class TestingDaoCsvTest {
         Question question2 = new Question(localizedQuestion2Text, QuestionType.FREE,
                 Arrays.asList(answerToSecondQuestion));
         Testing expectedFoundTesting = new Testing(localizedTheme, Arrays.asList(question1, question2));
-
-        given(translationService.getTranslatedString(any())).willReturn("Unexpected");
-        given(translationService.getTranslatedString("testing.theme1.Answer1-1")).willReturn(localizedAnswerTextToFirstQuestion1);
-        given(translationService.getTranslatedString("testing.theme1.Answer1-2")).willReturn(localizedAnswerTextToFirstQuestion2);
-        given(translationService.getTranslatedString("testing.theme1.Question1")).willReturn(localizedQuestion1Text);
-        given(translationService.getTranslatedString("testing.theme1.Answer2-1")).willReturn(localizedAnswerTextToSecondQuestion);
-        given(translationService.getTranslatedString("testing.theme1.Question2")).willReturn(localizedQuestion2Text);
-        given(translationService.getTranslatedString("testing.theme1")).willReturn(localizedTheme);
 
         List<Testing> foundTestings = testingDao.findAll();
         assertThat(foundTestings).isNotEmpty();

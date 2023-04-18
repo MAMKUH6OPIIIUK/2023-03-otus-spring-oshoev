@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import ru.otus.spring.homework.oke.config.TestingServiceProperties;
+import ru.otus.spring.homework.oke.config.ApplicationPropertiesProvider;
 import ru.otus.spring.homework.oke.dao.TestingDao;
 import ru.otus.spring.homework.oke.domain.Answer;
 import ru.otus.spring.homework.oke.domain.Question;
@@ -16,7 +16,9 @@ import ru.otus.spring.homework.oke.domain.QuestionType;
 import ru.otus.spring.homework.oke.domain.Testing;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -33,7 +35,7 @@ public class TestingServiceImplTest {
     IOService ioService;
 
     @Mock
-    TranslationService translationService;
+    LocalizeService localizeService;
 
     TestingServiceImpl testingService;
 
@@ -48,24 +50,24 @@ public class TestingServiceImplTest {
 
     @BeforeEach
     public void setUp() {
+        Map<String, Object> serviceProperties = new HashMap<>();
         String themeName = "Test theme";
+        serviceProperties.put(ApplicationPropertiesProvider.TESTING_THEME_PROPERTY, themeName);
         Integer passingScore = 10;
+        serviceProperties.put(ApplicationPropertiesProvider.TESTING_PASSING_SCORE_PROPERTY, passingScore);
+        ApplicationPropertiesProvider propertiesProvider = new ApplicationPropertiesProvider();
+        propertiesProvider.setService(serviceProperties);
+        testingService = new TestingServiceImpl(testingDao, propertiesProvider, ioService, localizeService);
 
-        TestingServiceProperties testingServiceProperties = new TestingServiceProperties();
-        testingServiceProperties.setTheme(themeName);
-        testingServiceProperties.setPassingScore(passingScore);
-
-        testingService = new TestingServiceImpl(testingDao, testingServiceProperties, ioService, translationService);
-
-        given(translationService.getTranslatedString(any())).willReturn(new String());
-        given(translationService.getTranslatedString(any(), any())).willReturn(new String());
-        given(translationService.getTranslatedString(TestingServiceImpl.STUDENT_NAME_PROMPT_CODE))
+        given(localizeService.getMessage(any())).willReturn(new String());
+        given(localizeService.getMessage(any(), any())).willReturn(new String());
+        given(localizeService.getMessage(TestingServiceImpl.STUDENT_NAME_PROMPT_CODE))
                 .willReturn(EXPECTED_STUDENT_NAME_PROMPT);
-        given(translationService.getTranslatedString(TestingServiceImpl.STUDENT_SURNAME_PROMPT_CODE))
+        given(localizeService.getMessage(TestingServiceImpl.STUDENT_SURNAME_PROMPT_CODE))
                 .willReturn(EXPECTED_STUDENT_SURNAME_PROMPT);
-        given(translationService.getTranslatedString(TestingServiceImpl.SELECT_ONE_ANSWER_PROMPT_CODE))
+        given(localizeService.getMessage(TestingServiceImpl.SELECT_ONE_ANSWER_PROMPT_CODE))
                 .willReturn(EXPECTED_SELECT_ONE_ANSWER_PROMPT);
-        given(translationService.getTranslatedString(TestingServiceImpl.FREE_ANSWER_PROMPT_CODE))
+        given(localizeService.getMessage(TestingServiceImpl.FREE_ANSWER_PROMPT_CODE))
                 .willReturn(EXPECTED_FREE_ANSWER_PROMPT);
     }
 
@@ -81,13 +83,13 @@ public class TestingServiceImplTest {
 
         given(testingDao.findAll()).willReturn(Arrays.asList(testing));
 
-        given(translationService.getTranslatedString(TestingServiceImpl.QUESTION_FORMAT_CODE,
-                new Object[]{1, expectedQuestion1.getQuestionText()})).
-                willReturn("Вопрос №1: " + expectedQuestion1.getQuestionText());
-        given(translationService.getTranslatedString(TestingServiceImpl.QUESTION_FORMAT_CODE,
-                new Object[]{2, expectedQuestion2.getQuestionText()})).
-                willReturn("Вопрос №2: " + expectedQuestion2.getQuestionText());
-        given(translationService.getTranslatedString(TestingServiceImpl.TESTING_PASSED_FORMAT_CODE,
+        given(localizeService.getMessage(TestingServiceImpl.QUESTION_FORMAT_CODE,
+                new Object[]{1, expectedQuestion1.getText()})).
+                willReturn("Вопрос №1: " + expectedQuestion1.getText());
+        given(localizeService.getMessage(TestingServiceImpl.QUESTION_FORMAT_CODE,
+                new Object[]{2, expectedQuestion2.getText()})).
+                willReturn("Вопрос №2: " + expectedQuestion2.getText());
+        given(localizeService.getMessage(TestingServiceImpl.TESTING_PASSED_FORMAT_CODE,
                 new Object[]{"", 10})).willReturn("Your score: 10");
 
         given(ioService.readLineWithPrompt(any())).willReturn(new String());
@@ -98,8 +100,8 @@ public class TestingServiceImplTest {
         verify(ioService, times(1)).readLineWithPrompt(EXPECTED_STUDENT_NAME_PROMPT);
         verify(ioService, times(1)).readLineWithPrompt(EXPECTED_STUDENT_SURNAME_PROMPT);
         verify(ioService, times(expectedQuestions.size())).printLine(contains("Вопрос №"));
-        verify(ioService, times(1)).printLine(contains(expectedQuestion1.getQuestionText()));
-        verify(ioService, times(1)).printLine(contains(expectedQuestion2.getQuestionText()));
+        verify(ioService, times(1)).printLine(contains(expectedQuestion1.getText()));
+        verify(ioService, times(1)).printLine(contains(expectedQuestion2.getText()));
         verify(ioService, times(1)).printLine(matches(".*Your score: [0-9]+.*"));
     }
 
@@ -116,7 +118,7 @@ public class TestingServiceImplTest {
 
         given(testingDao.findAll()).willReturn(Arrays.asList(testing));
 
-        given(translationService.getTranslatedString(TestingServiceImpl.TESTING_PASSED_FORMAT_CODE,
+        given(localizeService.getMessage(TestingServiceImpl.TESTING_PASSED_FORMAT_CODE,
                 new Object[]{expectedName, expectedScore})).
                 willReturn("Дорогой " + expectedName + "! Поздравляем, тестирование успешно пройдено. Ваш балл: " +
                         expectedScore);
@@ -148,7 +150,7 @@ public class TestingServiceImplTest {
 
         given(testingDao.findAll()).willReturn(Arrays.asList(testing));
 
-        given(translationService.getTranslatedString(TestingServiceImpl.TESTING_PASSED_FORMAT_CODE,
+        given(localizeService.getMessage(TestingServiceImpl.TESTING_PASSED_FORMAT_CODE,
                 new Object[]{expectedName, expectedScore})).
                 willReturn("Дорогой " + expectedName + "! Поздравляем, тестирование успешно пройдено. Ваш балл: " +
                         expectedScore);
@@ -176,7 +178,7 @@ public class TestingServiceImplTest {
 
         given(testingDao.findAll()).willReturn(Arrays.asList(testing));
 
-        given(translationService.getTranslatedString(TestingServiceImpl.TESTING_NOT_PASSED_FORMAT_CODE,
+        given(localizeService.getMessage(TestingServiceImpl.TESTING_NOT_PASSED_FORMAT_CODE,
                 new Object[]{expectedScore})).
                 willReturn("Sorry, you didn't pass the test. Your score: " +
                         expectedScore);
@@ -200,7 +202,7 @@ public class TestingServiceImplTest {
 
         given(testingDao.findAll()).willReturn(Arrays.asList(testing));
 
-        given(translationService.getTranslatedString(TestingServiceImpl.TESTING_NOT_FOUND_CODE)).
+        given(localizeService.getMessage(TestingServiceImpl.TESTING_NOT_FOUND_CODE)).
                 willReturn("Sorry. Testing not found");
 
         boolean testingResult = testingService.executeStudentTesting();

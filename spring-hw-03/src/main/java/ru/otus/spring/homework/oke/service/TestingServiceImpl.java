@@ -1,7 +1,7 @@
 package ru.otus.spring.homework.oke.service;
 
 import org.springframework.stereotype.Service;
-import ru.otus.spring.homework.oke.config.TestingServiceProperties;
+import ru.otus.spring.homework.oke.config.TestingServicePropertiesProvider;
 import ru.otus.spring.homework.oke.dao.TestingDao;
 import ru.otus.spring.homework.oke.domain.Testing;
 import ru.otus.spring.homework.oke.domain.Question;
@@ -45,17 +45,17 @@ public class TestingServiceImpl implements TestingService {
 
     private final IOService ioService;
 
-    private final TranslationService translationService;
+    private final LocalizeService localizeService;
 
     public TestingServiceImpl(TestingDao testingDao,
-                              TestingServiceProperties testingServiceProperties,
+                              TestingServicePropertiesProvider testingServicePropertiesProvider,
                               IOService ioService,
-                              TranslationService translationService) {
+                              LocalizeService localizeService) {
         this.testingDao = testingDao;
-        this.testingTheme = testingServiceProperties.getTheme();
-        this.passingScore = testingServiceProperties.getPassingScore();
+        this.testingTheme = testingServicePropertiesProvider.getTheme();
+        this.passingScore = testingServicePropertiesProvider.getPassingScore();
         this.ioService = ioService;
-        this.translationService = translationService;
+        this.localizeService = localizeService;
     }
 
     /**
@@ -74,7 +74,7 @@ public class TestingServiceImpl implements TestingService {
         List<Testing> testings = this.testingDao.findAll();
         Testing testing = this.chooseTesting(testings);
         if (testing == null) {
-            String errorMessage = this.translationService.getTranslatedString(TESTING_NOT_FOUND_CODE);
+            String errorMessage = this.localizeService.getMessage(TESTING_NOT_FOUND_CODE);
             this.ioService.printLine(errorMessage);
             return false;
         }
@@ -91,33 +91,33 @@ public class TestingServiceImpl implements TestingService {
     }
 
     private void printHeader(Testing testing) {
-        String tempMessage = this.translationService.getTranslatedString(TESTING_BEGIN_MESSAGE_CODE);
+        String tempMessage = this.localizeService.getMessage(TESTING_BEGIN_MESSAGE_CODE);
         this.ioService.printLine(tempMessage);
-        tempMessage = this.translationService.getTranslatedString(QUESTIONS_COUNT_MESSAGE_CODE,
+        tempMessage = this.localizeService.getMessage(QUESTIONS_COUNT_MESSAGE_CODE,
                 new Integer[]{testing.getQuestions().size()});
         this.ioService.printLine(tempMessage);
-        tempMessage = this.translationService.getTranslatedString(MAX_SCORE_MESSAGE_CODE,
+        tempMessage = this.localizeService.getMessage(MAX_SCORE_MESSAGE_CODE,
                 new Integer[]{testing.getMaxScore()});
         this.ioService.printLine(tempMessage);
     }
 
     private Student askStudentFullName() {
-        String namePrompt = this.translationService.getTranslatedString(STUDENT_NAME_PROMPT_CODE);
+        String namePrompt = this.localizeService.getMessage(STUDENT_NAME_PROMPT_CODE);
         String name = this.ioService.readLineWithPrompt(namePrompt);
-        String surnamePrompt = this.translationService.getTranslatedString(STUDENT_SURNAME_PROMPT_CODE);
+        String surnamePrompt = this.localizeService.getMessage(STUDENT_SURNAME_PROMPT_CODE);
         String surname = this.ioService.readLineWithPrompt(surnamePrompt);
         return new Student(name, surname);
     }
 
     private void printQuestion(int questionNumber, Question question) {
-        String formattedQuestion = this.translationService.getTranslatedString(QUESTION_FORMAT_CODE,
-                new Object[]{questionNumber, question.getQuestionText()});
+        String formattedQuestion = this.localizeService.getMessage(QUESTION_FORMAT_CODE,
+                new Object[]{questionNumber, question.getText()});
         this.ioService.printLine(formattedQuestion);
-        if (question.getQuestionType().equals(QuestionType.SELECT_ONE)) {
-            String selectableAnswersHeader = this.translationService.getTranslatedString(SELECT_ANSWERS_HEADER_CODE);
+        if (question.getType().equals(QuestionType.SELECT_ONE)) {
+            String selectableAnswersHeader = this.localizeService.getMessage(SELECT_ANSWERS_HEADER_CODE);
             this.ioService.printLine(selectableAnswersHeader);
             for (Answer answer : question.getAnswers()) {
-                this.ioService.printLine(answer.getAnswerText());
+                this.ioService.printLine(answer.getText());
             }
         }
     }
@@ -132,7 +132,7 @@ public class TestingServiceImpl implements TestingService {
      * @return ответ на вопрос
      */
     private Answer readStudentAnswer(Question question) {
-        if (question.getQuestionType().equals(QuestionType.SELECT_ONE)) {
+        if (question.getType().equals(QuestionType.SELECT_ONE)) {
             return readSelectingAnswer(question);
         } else {
             return readFreeAnswer(question);
@@ -140,7 +140,7 @@ public class TestingServiceImpl implements TestingService {
     }
 
     private Answer readSelectingAnswer(Question question) {
-        String selectAnswerPrompt = this.translationService.getTranslatedString(SELECT_ONE_ANSWER_PROMPT_CODE);
+        String selectAnswerPrompt = this.localizeService.getMessage(SELECT_ONE_ANSWER_PROMPT_CODE);
         Answer studentAnswer = null;
         while (studentAnswer == null) {
             String studentAnswerText = this.ioService.readLineWithPrompt(selectAnswerPrompt);
@@ -150,7 +150,7 @@ public class TestingServiceImpl implements TestingService {
     }
 
     private Answer readFreeAnswer(Question question) {
-        String freeAnswerPrompt = this.translationService.getTranslatedString(FREE_ANSWER_PROMPT_CODE);
+        String freeAnswerPrompt = this.localizeService.getMessage(FREE_ANSWER_PROMPT_CODE);
         String studentAnswerText = this.ioService.readLineWithPrompt(freeAnswerPrompt);
         Answer foundAnswer = question.getAnswerByText(studentAnswerText);
         if (foundAnswer != null) {
@@ -170,13 +170,13 @@ public class TestingServiceImpl implements TestingService {
 
     private boolean calculateTestingResult(Testing testing, Student student, int studentScore) {
         if (studentScore >= this.passingScore || studentScore >= testing.getMaxScore()) {
-            String passedMessageFormatted = this.translationService.getTranslatedString(TESTING_PASSED_FORMAT_CODE,
+            String passedMessageFormatted = this.localizeService.getMessage(TESTING_PASSED_FORMAT_CODE,
                     new Object[]{student.getName(), studentScore});
             this.ioService.printLine(passedMessageFormatted);
             return true;
         } else {
-            String notPassedMessageFormatted = this.translationService
-                    .getTranslatedString(TESTING_NOT_PASSED_FORMAT_CODE, new Integer[]{studentScore});
+            String notPassedMessageFormatted = this.localizeService
+                    .getMessage(TESTING_NOT_PASSED_FORMAT_CODE, new Integer[]{studentScore});
             this.ioService.printLine(notPassedMessageFormatted);
             return false;
         }

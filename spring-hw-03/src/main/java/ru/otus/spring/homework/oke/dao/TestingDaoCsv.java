@@ -29,11 +29,13 @@ import java.util.List;
  */
 @Repository
 public class TestingDaoCsv implements TestingDao {
-    private final URL localizedCsvResourceUrl;
+    private static final String RESOURCE_EXTENSION = "csv";
 
-    private final LocalizeService localizeService;
+    private final String csvResourceBasename;
 
     private final Charset resourceEncoding;
+
+    private final LocalizeService localizeService;
 
     /**
      * Конструктор класса
@@ -43,15 +45,9 @@ public class TestingDaoCsv implements TestingDao {
      */
     public TestingDaoCsv(TestingDaoPropertiesProvider testingDaoPropertiesProvider,
                          LocalizeService localizeService) {
+        this.csvResourceBasename = testingDaoPropertiesProvider.getResourceBasename();
         this.resourceEncoding = testingDaoPropertiesProvider.getEncoding();
-        String csvResourceBasename = testingDaoPropertiesProvider.getResourceBasename();
         this.localizeService = localizeService;
-        String resourceFileFormat = "csv";
-        this.localizedCsvResourceUrl = localizeService.getResourceUrl(csvResourceBasename, resourceFileFormat);
-        if (localizedCsvResourceUrl == null) {
-            String errorMessage = this.localizeService.getMessage("error.csv.not-found");
-            throw new IncorrectCsvFormatException(errorMessage);
-        }
     }
 
     /**
@@ -63,7 +59,11 @@ public class TestingDaoCsv implements TestingDao {
     @Override
     public List<Testing> findAll() {
         List<Testing> result = new ArrayList<>();
-
+        URL localizedCsvResourceUrl = this.localizeService.getResourceUrl(this.csvResourceBasename, RESOURCE_EXTENSION);
+        if (localizedCsvResourceUrl == null) {
+            String errorMessage = this.localizeService.getMessage("error.csv.not-found");
+            throw new IncorrectCsvFormatException(errorMessage);
+        }
         try (InputStream inputStream = localizedCsvResourceUrl.openStream()) {
             readFromInputStream(inputStream, result);
             return result;

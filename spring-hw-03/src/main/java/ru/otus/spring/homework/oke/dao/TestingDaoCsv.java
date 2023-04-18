@@ -44,7 +44,7 @@ public class TestingDaoCsv implements TestingDao {
     public TestingDaoCsv(TestingDaoPropertiesProvider testingDaoPropertiesProvider,
                          LocalizeService localizeService) {
         this.resourceEncoding = testingDaoPropertiesProvider.getEncoding();
-        String csvResourceBasename = testingDaoPropertiesProvider.getTestingResourceBasename();
+        String csvResourceBasename = testingDaoPropertiesProvider.getResourceBasename();
         this.localizeService = localizeService;
         String resourceFileFormat = "csv";
         this.localizedCsvResourceUrl = localizeService.getResourceUrl(csvResourceBasename, resourceFileFormat);

@@ -31,7 +31,7 @@ public class ApplicationPropertiesProvider implements LocaleProvider, TestingDao
     }
 
     @Override
-    public String getTestingResourceBasename() {
+    public String getResourceBasename() {
         return (String) this.dao.get(DAO_RESOURCE_PROPERTY);
     }
 

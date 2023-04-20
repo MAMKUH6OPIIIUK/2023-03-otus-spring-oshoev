@@ -66,17 +66,15 @@ public class TestingServiceImpl implements TestingService {
      * - запрашивает у студента ответ на вопрос
      * - прибавляет балл за ответ к суммарному баллу
      * - вычисляет факт успешности или неуспешности тестирования
-     *
-     * @return true, если студент прошел тестирование
      */
     @Override
-    public boolean executeStudentTesting() {
+    public void executeStudentTesting() {
         List<Testing> testings = this.testingDao.findAll();
         Testing testing = this.chooseTesting(testings);
         if (testing == null) {
             String errorMessage = this.localizeService.getMessage(TESTING_NOT_FOUND_CODE);
             this.ioService.printLine(errorMessage);
-            return false;
+            return;
         }
         this.printHeader(testing);
         Student student = this.askStudentFullName();
@@ -87,7 +85,7 @@ public class TestingServiceImpl implements TestingService {
             Answer studentAnswer = readStudentAnswer(currentQuestion);
             totalResult += studentAnswer.getScore();
         }
-        return this.calculateTestingResult(testing, student, totalResult);
+        this.calculateTestingResult(testing, student, totalResult);
     }
 
     private void printHeader(Testing testing) {
@@ -168,17 +166,15 @@ public class TestingServiceImpl implements TestingService {
         return null;
     }
 
-    private boolean calculateTestingResult(Testing testing, Student student, int studentScore) {
+    private void calculateTestingResult(Testing testing, Student student, int studentScore) {
         if (studentScore >= this.passingScore || studentScore >= testing.getMaxScore()) {
             String passedMessageFormatted = this.localizeService.getMessage(TESTING_PASSED_FORMAT_CODE,
                     new Object[]{student.getName(), studentScore});
             this.ioService.printLine(passedMessageFormatted);
-            return true;
         } else {
             String notPassedMessageFormatted = this.localizeService
                     .getMessage(TESTING_NOT_PASSED_FORMAT_CODE, new Integer[]{studentScore});
             this.ioService.printLine(notPassedMessageFormatted);
-            return false;
         }
     }
 

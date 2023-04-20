@@ -14,10 +14,7 @@ import ru.otus.spring.homework.oke.domain.Answer;
 import ru.otus.spring.homework.oke.domain.Question;
 import ru.otus.spring.homework.oke.domain.QuestionType;
 import ru.otus.spring.homework.oke.domain.Testing;
-import ru.otus.spring.homework.oke.service.LocalizeService;
-import ru.otus.spring.homework.oke.service.LocalizeServiceImpl;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Дао для работы с csv файлом с тестированиями ")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class TestingDaoCsvTest {
+public class TestingDaoLocalizedCsvTest {
     @Mock
     private MessageSource messageSource;
 
@@ -39,8 +36,7 @@ public class TestingDaoCsvTest {
         daoProperties.put(ApplicationPropertiesProvider.DAO_ENCODING_PROPERTY, "UTF-8");
         propertiesProvider.setDao(daoProperties);
         propertiesProvider.setLocale(new Locale("ru_RU"));
-        LocalizeService localizeService = new LocalizeServiceImpl(messageSource, propertiesProvider);
-        testingDao = new TestingDaoCsv(propertiesProvider, localizeService);
+        testingDao = new TestingDaoLocalizedCsv(propertiesProvider, propertiesProvider);
     }
 
     @DisplayName("должен возвращать список тестирований с 1 тестированием, содержащим все локализованные вопросы из csv")

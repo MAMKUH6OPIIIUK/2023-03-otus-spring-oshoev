@@ -130,9 +130,8 @@ public class TestingServiceImplTest {
         given(ioService.readLineWithPrompt(EXPECTED_FREE_ANSWER_PROMPT))
                 .willReturn(correctFreeAnswer);
 
-        boolean testingResult = testingService.executeStudentTesting();
+        testingService.executeStudentTesting();
 
-        assertThat(testingResult).isEqualTo(true);
         verify(ioService, times(1)).printLine(contains(expectedName + "! Поздравляем"));
         verify(ioService, times(1)).printLine(contains("Ваш балл: " + expectedScore));
     }
@@ -160,9 +159,8 @@ public class TestingServiceImplTest {
         given(ioService.readLineWithPrompt(EXPECTED_SELECT_ONE_ANSWER_PROMPT)).willReturn(correctSelectableAnswer);
         given(ioService.readLineWithPrompt(EXPECTED_FREE_ANSWER_PROMPT)).willReturn(incorrectFreeAnswer);
 
-        boolean testingResult = testingService.executeStudentTesting();
+        testingService.executeStudentTesting();
 
-        assertThat(testingResult).isEqualTo(true);
         verify(ioService, times(1)).printLine(contains(expectedName + "! Поздравляем"));
         verify(ioService, times(1)).printLine(contains("Ваш балл: " + expectedScore));
     }
@@ -187,9 +185,8 @@ public class TestingServiceImplTest {
         given(ioService.readLineWithPrompt(EXPECTED_SELECT_ONE_ANSWER_PROMPT)).willReturn(incorrectSelectableAnswer);
         given(ioService.readLineWithPrompt(EXPECTED_FREE_ANSWER_PROMPT)).willReturn(incorrectFreeAnswer);
 
-        boolean testingResult = testingService.executeStudentTesting();
+        testingService.executeStudentTesting();
 
-        assertThat(testingResult).isEqualTo(false);
         verify(ioService, times(1)).printLine(contains("Sorry, you didn't pass the test"));
         verify(ioService, times(1)).printLine(contains("Your score: " + expectedScore));
     }
@@ -205,9 +202,8 @@ public class TestingServiceImplTest {
         given(localizeService.getMessage(TestingServiceImpl.TESTING_NOT_FOUND_CODE)).
                 willReturn("Sorry. Testing not found");
 
-        boolean testingResult = testingService.executeStudentTesting();
+        testingService.executeStudentTesting();
 
-        assertThat(testingResult).isEqualTo(false);
         verify(ioService, times(1)).printLine(contains("Sorry. Testing not found"));
     }
 

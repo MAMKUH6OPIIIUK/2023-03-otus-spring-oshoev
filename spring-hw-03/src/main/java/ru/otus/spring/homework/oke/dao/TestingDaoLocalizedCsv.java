@@ -5,12 +5,12 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import org.springframework.stereotype.Repository;
+import ru.otus.spring.homework.oke.config.LocaleProvider;
 import ru.otus.spring.homework.oke.config.TestingDaoPropertiesProvider;
 import ru.otus.spring.homework.oke.domain.Answer;
 import ru.otus.spring.homework.oke.domain.Question;
 import ru.otus.spring.homework.oke.domain.QuestionType;
 import ru.otus.spring.homework.oke.domain.Testing;
-import ru.otus.spring.homework.oke.service.LocalizeService;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -21,6 +21,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Класс для доступа к локализованным данным из csv конфигурации тестирования
@@ -28,49 +30,69 @@ import java.util.List;
  * Данные из ресурса читаются при каждом вызове методов данного класса
  */
 @Repository
-public class TestingDaoCsv implements TestingDao {
+public class TestingDaoLocalizedCsv implements TestingDao {
     private static final String RESOURCE_EXTENSION = "csv";
 
     private final String csvResourceBasename;
 
     private final Charset resourceEncoding;
 
-    private final LocalizeService localizeService;
+    private final LocaleProvider localeProvider;
 
     /**
      * Конструктор класса
      *
      * @param testingDaoPropertiesProvider предоставляет доступ к настройкам dao
-     * @param localizeService              сервис локализации
+     * @param localeProvider              провайдер локали приложения
      */
-    public TestingDaoCsv(TestingDaoPropertiesProvider testingDaoPropertiesProvider,
-                         LocalizeService localizeService) {
+    public TestingDaoLocalizedCsv(TestingDaoPropertiesProvider testingDaoPropertiesProvider,
+                                  LocaleProvider localeProvider) {
         this.csvResourceBasename = testingDaoPropertiesProvider.getResourceBasename();
         this.resourceEncoding = testingDaoPropertiesProvider.getEncoding();
-        this.localizeService = localizeService;
+        this.localeProvider = localeProvider;
     }
 
     /**
      * Метод читает CSV конфигурацию вопросов тестирований
      *
      * @return список сконфигурированных тестирований, если CSV-ресурс имеет корректный формат строк
-     * и его удалось прочитать, либо исключение IncorrectCsvFormatException
+     * и его удалось прочитать, либо исключение TestingLoadingException
      */
     @Override
     public List<Testing> findAll() {
         List<Testing> result = new ArrayList<>();
-        URL localizedCsvResourceUrl = this.localizeService.getResourceUrl(this.csvResourceBasename, RESOURCE_EXTENSION);
+        URL localizedCsvResourceUrl = getResourceUrl();
         if (localizedCsvResourceUrl == null) {
-            String errorMessage = this.localizeService.getMessage("error.csv.not-found");
-            throw new IncorrectCsvFormatException(errorMessage);
+            throw new TestingLoadingException("CSV resource not found");
         }
         try (InputStream inputStream = localizedCsvResourceUrl.openStream()) {
             readFromInputStream(inputStream, result);
             return result;
         } catch (IOException e) {
-            throw new IncorrectCsvFormatException(this.localizeService.
-                    getMessage("error.csv.unknown-error"), e);
+            throw new TestingLoadingException("Unknown error reading CSV resource", e);
         }
+    }
+
+    /**
+     * Метод для поиска локализованного ресурса
+     * Локализованные ресурсы ищутся от конкретных локалей к более общим
+     *
+     * @return URL найденного ресурса для установленной локали, либо null
+     */
+    private URL getResourceUrl() {
+        Locale locale = this.localeProvider.getLocale();
+        ResourceBundle.Control control = ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_DEFAULT);
+        List<Locale> localeCandidates = control.getCandidateLocales(this.csvResourceBasename, locale);
+        ClassLoader classLoader = getClass().getClassLoader();
+        for (Locale specificLocale : localeCandidates) {
+            String bundleName = control.toBundleName(this.csvResourceBasename, specificLocale);
+            String resourceName = control.toResourceName(bundleName, RESOURCE_EXTENSION);
+            URL url = classLoader.getResource(resourceName);
+            if (url != null) {
+                return url;
+            }
+        }
+        return null;
     }
 
     /**
@@ -79,7 +101,7 @@ public class TestingDaoCsv implements TestingDao {
      * @param inputStream InputStream читаемого CSV-ресурса
      * @param testings    список тестирований с вопросами по темам, который будет наполнен в результате работы метода
      * @throws IOException
-     * @throws IncorrectCsvFormatException если строка в CSV-ресурсе имеет неожиданный набор стоблцов и их значений.
+     * @throws TestingLoadingException если строка в CSV-ресурсе имеет неожиданный набор стоблцов и их значений.
      *                                     См. {@link #parseLineAndSave(String[], List)}
      */
     private void readFromInputStream(InputStream inputStream, List<Testing> testings)
@@ -108,13 +130,12 @@ public class TestingDaoCsv implements TestingDao {
      *
      * @param csvLine  строка из CSV файла
      * @param testings список тестирований, к которому будет добавлен результат парсинга строки
-     * @throws IncorrectCsvFormatException если тип вопроса не является допустимым значением, либо балл за ответ
+     * @throws TestingLoadingException если тип вопроса не является допустимым значением, либо балл за ответ
      *                                     не является числом
      */
     private void parseLineAndSave(String[] csvLine, List<Testing> testings) {
         if (csvLine.length != 5) {
-            throw new IncorrectCsvFormatException(this.localizeService.
-                    getMessage("error.csv.wrong-row-length"));
+            throw new TestingLoadingException("Q&A CSV resource must contain 5 columns");
         }
         Testing savedTesting = getTestingByTheme(testings, csvLine[0]);
         if (savedTesting == null) {
@@ -124,8 +145,7 @@ public class TestingDaoCsv implements TestingDao {
         try {
             rowQuestionType = QuestionType.fromString(csvLine[1]);
         } catch (IllegalArgumentException e) {
-            throw new IncorrectCsvFormatException(this.localizeService
-                    .getMessage("error.csv.wrong-question-type"));
+            throw new TestingLoadingException("Incorrect question type in column 1");
         }
         Question existentQuestion = savedTesting.getQuestionByTypeAndText(rowQuestionType, csvLine[2]);
         if (existentQuestion != null) {
@@ -170,7 +190,7 @@ public class TestingDaoCsv implements TestingDao {
      *
      * @param testing тестирование, к которому будет добавлен новый вопрос
      * @param line    строка из CSV файла
-     * @throws IncorrectCsvFormatException См. {@link #parseLineAndSave(String[], List)}
+     * @throws TestingLoadingException См. {@link #parseLineAndSave(String[], List)}
      */
     private void saveNewQuestion(Testing testing, String[] line) {
         try {
@@ -179,11 +199,9 @@ public class TestingDaoCsv implements TestingDao {
             newAnswers.add(newAnswerForQuestion);
             testing.getQuestions().add(new Question(line[2], line[1], newAnswers));
         } catch (NumberFormatException e) {
-            throw new IncorrectCsvFormatException(this.localizeService
-                    .getMessage("error.csv.wrong-score"));
+            throw new TestingLoadingException("Column 4 must be integer");
         } catch (IllegalArgumentException e) {
-            throw new IncorrectCsvFormatException(this.localizeService
-                    .getMessage("error.csv.wrong-question-type"));
+            throw new TestingLoadingException("Incorrect question type in column 1");
         }
     }
 
@@ -193,7 +211,7 @@ public class TestingDaoCsv implements TestingDao {
      *
      * @param savedQuestion вопрос, к списку вариантов ответа на который, будет добавлен новый вариант из CSV строки
      * @param line          строка из CSV файла
-     * @throws IncorrectCsvFormatException См. {@link #parseLineAndSave(String[], List)}
+     * @throws TestingLoadingException См. {@link #parseLineAndSave(String[], List)}
      */
     private void updateSavedQuestion(Question savedQuestion, String[] line) {
         Answer savedAnswer = savedQuestion.getAnswerByText(line[3]);
@@ -204,8 +222,7 @@ public class TestingDaoCsv implements TestingDao {
                 Answer newAnswerForQuestion = new Answer(line[3], Integer.valueOf(line[4]));
                 savedQuestion.getAnswers().add(newAnswerForQuestion);
             } catch (NumberFormatException e) {
-                throw new IncorrectCsvFormatException(this.localizeService
-                        .getMessage("error.csv.wrong-score"));
+                throw new TestingLoadingException("Column 4 must be integer");
             }
         }
     }

@@ -22,9 +22,4 @@ public class ApplicationPropertiesProvider implements LocaleProvider, TestingDao
     private String theme;
 
     private int passingScore;
-
-    @Override
-    public Locale getLocale() {
-        return this.locale;
-    }
 }

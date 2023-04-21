@@ -5,7 +5,6 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import org.springframework.stereotype.Repository;
-import ru.otus.spring.homework.oke.config.LocaleProvider;
 import ru.otus.spring.homework.oke.config.TestingDaoPropertiesProvider;
 import ru.otus.spring.homework.oke.domain.Answer;
 import ru.otus.spring.homework.oke.domain.Question;
@@ -17,39 +16,30 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 /**
- * Класс для доступа к локализованным данным из csv конфигурации тестирования
+ * Класс для доступа к данным из csv ресурса
  * <p>
  * Данные из ресурса читаются при каждом вызове методов данного класса
  */
 @Repository
-public class TestingDaoLocalizedCsv implements TestingDao {
-    private static final String RESOURCE_EXTENSION = "csv";
+public class TestingDaoCsv implements TestingDao {
 
-    private final String csvResourceBasename;
+    private final String csvResourceName;
 
     private final Charset resourceEncoding;
-
-    private final LocaleProvider localeProvider;
 
     /**
      * Конструктор класса
      *
      * @param testingDaoPropertiesProvider предоставляет доступ к настройкам dao
-     * @param localeProvider              провайдер локали приложения
      */
-    public TestingDaoLocalizedCsv(TestingDaoPropertiesProvider testingDaoPropertiesProvider,
-                                  LocaleProvider localeProvider) {
-        this.csvResourceBasename = testingDaoPropertiesProvider.getResourceBasename();
+    public TestingDaoCsv(TestingDaoPropertiesProvider testingDaoPropertiesProvider) {
+        this.csvResourceName = testingDaoPropertiesProvider.getResourceName();
         this.resourceEncoding = testingDaoPropertiesProvider.getEncoding();
-        this.localeProvider = localeProvider;
     }
 
     /**
@@ -60,52 +50,29 @@ public class TestingDaoLocalizedCsv implements TestingDao {
      */
     @Override
     public List<Testing> findAll() {
-        List<Testing> result = new ArrayList<>();
-        URL localizedCsvResourceUrl = getResourceUrl();
-        if (localizedCsvResourceUrl == null) {
-            throw new TestingLoadingException("CSV resource not found");
-        }
-        try (InputStream inputStream = localizedCsvResourceUrl.openStream()) {
-            readFromInputStream(inputStream, result);
-            return result;
+        ClassLoader classLoader = getClass().getClassLoader();
+        try (InputStream inputStream = classLoader.getResourceAsStream(this.csvResourceName)) {
+            if (inputStream != null) {
+                return loadFromInputStream(inputStream);
+            } else {
+                throw new TestingLoadingException("CSV resource not found");
+            }
         } catch (IOException e) {
             throw new TestingLoadingException("Unknown error reading CSV resource", e);
         }
     }
 
     /**
-     * Метод для поиска локализованного ресурса
-     * Локализованные ресурсы ищутся от конкретных локалей к более общим
-     *
-     * @return URL найденного ресурса для установленной локали, либо null
-     */
-    private URL getResourceUrl() {
-        Locale locale = this.localeProvider.getLocale();
-        ResourceBundle.Control control = ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_DEFAULT);
-        List<Locale> localeCandidates = control.getCandidateLocales(this.csvResourceBasename, locale);
-        ClassLoader classLoader = getClass().getClassLoader();
-        for (Locale specificLocale : localeCandidates) {
-            String bundleName = control.toBundleName(this.csvResourceBasename, specificLocale);
-            String resourceName = control.toResourceName(bundleName, RESOURCE_EXTENSION);
-            URL url = classLoader.getResource(resourceName);
-            if (url != null) {
-                return url;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Метод загружает CSV-ресурс из InputStream и читает его построчно
      *
      * @param inputStream InputStream читаемого CSV-ресурса
-     * @param testings    список тестирований с вопросами по темам, который будет наполнен в результате работы метода
      * @throws IOException
      * @throws TestingLoadingException если строка в CSV-ресурсе имеет неожиданный набор стоблцов и их значений.
      *                                     См. {@link #parseLineAndSave(String[], List)}
      */
-    private void readFromInputStream(InputStream inputStream, List<Testing> testings)
+    private List<Testing> loadFromInputStream(InputStream inputStream)
             throws IOException {
+        List<Testing> testings = new ArrayList<>();
         CSVParser parser = initParser();
         try (Reader reader
                      = new BufferedReader(new InputStreamReader(inputStream, this.resourceEncoding))) {
@@ -116,6 +83,7 @@ public class TestingDaoLocalizedCsv implements TestingDao {
                 }
             }
         }
+        return testings;
     }
 
     /**
@@ -215,9 +183,7 @@ public class TestingDaoLocalizedCsv implements TestingDao {
      */
     private void updateSavedQuestion(Question savedQuestion, String[] line) {
         Answer savedAnswer = savedQuestion.getAnswerByText(line[3]);
-        if (savedAnswer != null) {
-            return;
-        } else {
+        if (savedAnswer == null) {
             try {
                 Answer newAnswerForQuestion = new Answer(line[3], Integer.valueOf(line[4]));
                 savedQuestion.getAnswers().add(newAnswerForQuestion);

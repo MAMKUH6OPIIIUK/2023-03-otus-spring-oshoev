@@ -3,7 +3,7 @@ package ru.otus.spring.homework.oke.config;
 import java.nio.charset.Charset;
 
 public interface TestingDaoPropertiesProvider {
-    String getResourceBasename();
+    String getResourceName();
 
     Charset getEncoding();
 }

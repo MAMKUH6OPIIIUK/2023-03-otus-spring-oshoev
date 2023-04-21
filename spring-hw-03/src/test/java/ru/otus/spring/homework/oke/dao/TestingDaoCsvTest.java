@@ -4,39 +4,31 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-import org.springframework.context.MessageSource;
 import ru.otus.spring.homework.oke.config.ApplicationPropertiesProvider;
 import ru.otus.spring.homework.oke.domain.Answer;
 import ru.otus.spring.homework.oke.domain.Question;
 import ru.otus.spring.homework.oke.domain.QuestionType;
 import ru.otus.spring.homework.oke.domain.Testing;
 
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Дао для работы с csv файлом с тестированиями ")
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-public class TestingDaoLocalizedCsvTest {
-    @Mock
-    private MessageSource messageSource;
+public class TestingDaoCsvTest {
 
     private TestingDao testingDao;
 
     @BeforeEach
     public void setUp() {
         ApplicationPropertiesProvider propertiesProvider = new ApplicationPropertiesProvider();
-        Map<String, Object> daoProperties = new HashMap<>();
-        daoProperties.put(ApplicationPropertiesProvider.DAO_RESOURCE_PROPERTY, "junit_questions");
-        daoProperties.put(ApplicationPropertiesProvider.DAO_ENCODING_PROPERTY, "UTF-8");
-        propertiesProvider.setDao(daoProperties);
-        propertiesProvider.setLocale(new Locale("ru_RU"));
-        testingDao = new TestingDaoLocalizedCsv(propertiesProvider, propertiesProvider);
+        propertiesProvider.setResourceName("junit_questions_ru_RU.csv");
+        propertiesProvider.setEncoding(StandardCharsets.UTF_8);
+        testingDao = new TestingDaoCsv(propertiesProvider);
     }
 
     @DisplayName("должен возвращать список тестирований с 1 тестированием, содержащим все локализованные вопросы из csv")

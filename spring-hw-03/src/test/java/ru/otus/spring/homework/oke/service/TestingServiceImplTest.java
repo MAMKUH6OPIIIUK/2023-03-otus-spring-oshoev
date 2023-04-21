@@ -16,11 +16,8 @@ import ru.otus.spring.homework.oke.domain.QuestionType;
 import ru.otus.spring.homework.oke.domain.Testing;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -50,13 +47,11 @@ public class TestingServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        Map<String, Object> serviceProperties = new HashMap<>();
-        String themeName = "Test theme";
-        serviceProperties.put(ApplicationPropertiesProvider.TESTING_THEME_PROPERTY, themeName);
-        Integer passingScore = 10;
-        serviceProperties.put(ApplicationPropertiesProvider.TESTING_PASSING_SCORE_PROPERTY, passingScore);
         ApplicationPropertiesProvider propertiesProvider = new ApplicationPropertiesProvider();
-        propertiesProvider.setService(serviceProperties);
+        String themeName = "Test theme";
+        propertiesProvider.setTheme(themeName);
+        int passingScore = 10;
+        propertiesProvider.setPassingScore(passingScore);
         testingService = new TestingServiceImpl(testingDao, propertiesProvider, ioService, localizeService);
 
         given(localizeService.getMessage(any())).willReturn(new String());

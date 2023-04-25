@@ -1,0 +1,17 @@
+spring:
+  messages:
+    basename: "i18n/appmessages"
+    encoding: "UTF-8"
+  output:
+    ansi:
+      enabled: ALWAYS
+  shell:
+    interactive:
+      enabled: false
+
+testing:
+  locale: ru_RU
+  resource-Name: "junit_questions_${testing.locale}.csv"
+  encoding: "UTF-8"
+  theme: "Test theme"
+  passing-score: 10

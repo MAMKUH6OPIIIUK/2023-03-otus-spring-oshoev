@@ -1,0 +1,14 @@
+spring:
+  messages:
+    basename: "i18n/appmessages"
+    encoding: "UTF-8"
+  output:
+    ansi:
+      enabled: ALWAYS
+
+testing:
+  locale: ru_RU
+  resource-Name: "questions_${testing.locale}.csv"
+  encoding: "UTF-8"
+  theme: "Java testing from CSV"
+  passing-score: 40

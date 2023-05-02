@@ -13,6 +13,7 @@
         <module>spring-hw-02</module>
         <module>spring-hw-03</module>
         <module>spring-hw-04</module>
+        <module>spring-hw-05</module>
     </modules>
 
 </project>

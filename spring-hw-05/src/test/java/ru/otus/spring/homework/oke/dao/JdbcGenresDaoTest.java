@@ -14,8 +14,8 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Дао для работы с жанрами должно ")
 @JdbcTest
-@Import(GenresDaoJdbc.class)
-public class GenresDaoJdbcTest {
+@Import(JdbcGenresDao.class)
+public class JdbcGenresDaoTest {
     private static final long EXISTING_GENRE_ID = 1;
 
     private static final String EXISTING_GENRE_NAME = "Жанр1";

@@ -1,11 +1,12 @@
 package ru.otus.spring.homework.oke.formatters;
 
-import ru.otus.spring.homework.oke.domain.Book;
+import ru.otus.spring.homework.oke.dto.BookResponseDto;
 
 import java.util.List;
 
 public interface BookFormatter {
-    String formatBook(Book book, int indent);
+    String formatBook(BookResponseDto book, int indent);
 
-    String formatBooks(List<Book> books, int indent);
+    String formatBooks(List<BookResponseDto> books, int indent);
 }
+

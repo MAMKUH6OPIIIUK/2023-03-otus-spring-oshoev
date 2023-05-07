@@ -1,11 +1,11 @@
 package ru.otus.spring.homework.oke.formatters;
 
-import ru.otus.spring.homework.oke.domain.Author;
+import ru.otus.spring.homework.oke.dto.AuthorResponseDto;
 
 import java.util.List;
 
 public interface AuthorFormatter {
-    String formatAuthor(Author author, int indent);
+    String formatAuthor(AuthorResponseDto author, int indent);
 
-    String formatAuthors(List<Author> authors, int indent);
+    String formatAuthors(List<AuthorResponseDto> authors, int indent);
 }

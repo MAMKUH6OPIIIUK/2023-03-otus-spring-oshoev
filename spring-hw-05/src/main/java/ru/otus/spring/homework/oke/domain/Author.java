@@ -1,18 +1,25 @@
 package ru.otus.spring.homework.oke.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Data
 public class Author {
-    private final long id;
+    private long id;
 
-    private final String name;
+    private String name;
 
-    private final String middleName;
+    private String middleName;
 
-    private final String patronymic;
+    private String patronymic;
 
-    private final String surname;
+    private String surname;
+
+    public Author(String name, String middleName, String patronymic, String surname) {
+        this.name = name;
+        this.middleName = middleName;
+        this.patronymic = patronymic;
+        this.surname = surname;
+    }
 }

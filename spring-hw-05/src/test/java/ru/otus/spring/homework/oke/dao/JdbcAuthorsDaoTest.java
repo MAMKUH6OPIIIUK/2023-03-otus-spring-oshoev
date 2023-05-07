@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import ru.otus.spring.homework.oke.domain.Author;
-import ru.otus.spring.homework.oke.exceptions.AuthorBooksFoundException;
 
 import java.util.List;
 
@@ -15,8 +15,8 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Дао для работы с авторами должно ")
 @JdbcTest
-@Import(AuthorsDaoJdbc.class)
-public class AuthorsDaoJdbcTest {
+@Import(JdbcAuthorsDao.class)
+public class JdbcAuthorsDaoTest {
     private static final long EXISTING_AUTHOR_ID = 3;
 
     private static final long FIRST_NON_EXISTING_AUTHOR_ID = 4;
@@ -63,11 +63,11 @@ public class AuthorsDaoJdbcTest {
         assertThat(actualAuthorCount).isEqualTo(expectedAuthorCount);
     }
 
-    @DisplayName("бросить исключение AuthorBooksFoundException при попытке удалить автора, у которого есть книги")
+    @DisplayName("бросить исключение DataIntegrityViolationException при попытке удалить автора, у которого есть книги")
     @Test
-    void shouldThrowAuthorBooksFoundExceptionWhenDeleteWithExistingBooks() {
+    void shouldThrowDataIntegrityViolationExceptionWhenDeleteWithExistingBooks() {
         assertThatThrownBy(() -> this.authorsDao.deleteById(1))
-                .isInstanceOf(AuthorBooksFoundException.class);
+                .isInstanceOf(DataIntegrityViolationException.class);
     }
 
 }

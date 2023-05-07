@@ -1,7 +1,7 @@
 package ru.otus.spring.homework.oke.formatters;
 
 import org.springframework.stereotype.Component;
-import ru.otus.spring.homework.oke.domain.Author;
+import ru.otus.spring.homework.oke.dto.AuthorResponseDto;
 import ru.otus.spring.homework.oke.formatters.utils.IndentUtils;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 @Component
 public class SimpleAuthorFormatter implements AuthorFormatter {
     @Override
-    public String formatAuthor(Author author, int indent) {
+    public String formatAuthor(AuthorResponseDto author, int indent) {
         String indentPrefix = IndentUtils.getEntityPrefix(indent);
         String linePrefix = IndentUtils.getEntityLinePrefix(indent);
         StringBuilder builder = new StringBuilder();
@@ -33,7 +33,7 @@ public class SimpleAuthorFormatter implements AuthorFormatter {
     }
 
     @Override
-    public String formatAuthors(List<Author> authors, int indent) {
+    public String formatAuthors(List<AuthorResponseDto> authors, int indent) {
         StringBuilder builder = new StringBuilder();
         authors.forEach(a -> {
             builder.append(this.formatAuthor(a, indent) + System.lineSeparator());

@@ -1,20 +1,27 @@
 package ru.otus.spring.homework.oke.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Set;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Data
 public class Book {
-    private final long id;
+    private long id;
 
-    private final String title;
+    private String title;
 
-    private final String description;
+    private String description;
 
-    private final Author author;
+    private long authorId;
 
-    private final Set<Genre> genres;
+    private Set<Long> genreIds;
+
+    public Book(String title, String description, long authorId, Set<Long> genreIds) {
+        this.title = title;
+        this.description = description;
+        this.authorId = authorId;
+        this.genreIds = genreIds;
+    }
 }

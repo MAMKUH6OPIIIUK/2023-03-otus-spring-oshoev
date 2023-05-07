@@ -1,14 +1,12 @@
 package ru.otus.spring.homework.oke.dao;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.otus.spring.homework.oke.domain.Genre;
-import ru.otus.spring.homework.oke.exceptions.NonUniqueGenreException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,7 +16,7 @@ import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
-public class GenresDaoJdbc implements GenresDao {
+public class JdbcGenresDao implements GenresDao {
 
     private final NamedParameterJdbcOperations jdbc;
 
@@ -28,14 +26,9 @@ public class GenresDaoJdbc implements GenresDao {
         Map<String, Object> parameters = Collections.singletonMap("name", genre.getName());
         MapSqlParameterSource parameterSource = new MapSqlParameterSource(parameters);
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        try {
-            jdbc.update(sql, parameterSource, keyHolder);
-        } catch (DuplicateKeyException e) {
-            String errorMessage = "Жанр с указанным именем уже существует. Укажите новое уникальное имя жанра";
-            throw new NonUniqueGenreException(errorMessage, e);
-        }
-        Genre result = new Genre(keyHolder.getKey().longValue(), genre.getName());
-        return result;
+        jdbc.update(sql, parameterSource, keyHolder);
+        genre.setId(keyHolder.getKey().longValue());
+        return genre;
     }
 
     @Override

@@ -1,12 +1,18 @@
 package ru.otus.spring.homework.oke.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Data
 public class Genre {
-    private final long id;
+    private long id;
 
-    private final String name;
+    private String name;
+
+    public Genre(String name) {
+        this.name = name;
+    }
+
+
 }

@@ -1,15 +1,16 @@
 package ru.otus.spring.homework.oke.service;
 
-import ru.otus.spring.homework.oke.domain.Genre;
+import ru.otus.spring.homework.oke.dto.GenreRequestDto;
+import ru.otus.spring.homework.oke.dto.GenreResponseDto;
 
 import java.util.List;
 
 public interface GenresService {
-    Genre create(String name);
+    GenreResponseDto create(GenreRequestDto genreRequestDto);
 
-    Genre findById(long id);
+    GenreResponseDto findById(long id);
 
-    List<Genre> findAll();
+    List<GenreResponseDto> findAll();
 
     void deleteById(long id);
 }

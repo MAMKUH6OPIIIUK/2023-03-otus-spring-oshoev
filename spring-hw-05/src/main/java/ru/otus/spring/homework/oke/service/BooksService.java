@@ -1,17 +1,18 @@
 package ru.otus.spring.homework.oke.service;
 
-import ru.otus.spring.homework.oke.domain.Book;
+import ru.otus.spring.homework.oke.dto.BookRequestDto;
+import ru.otus.spring.homework.oke.dto.BookResponseDto;
 
 import java.util.List;
 
 public interface BooksService {
-    Book create(String title, String description, long authorId, long[] genreIds);
+    BookResponseDto create(BookRequestDto bookRequestDto);
 
-    Book update(long id, String title, String description, long authorId, long[] genreIds);
+    BookResponseDto update(long id, BookRequestDto bookRequestDto);
 
-    Book findById(long id);
+    BookResponseDto findById(long id);
 
-    List<Book> findAll();
+    List<BookResponseDto> findAll();
 
     void deleteById(long id);
 }

@@ -1,7 +1,7 @@
 package ru.otus.spring.homework.oke.formatters;
 
 import org.springframework.stereotype.Component;
-import ru.otus.spring.homework.oke.domain.Genre;
+import ru.otus.spring.homework.oke.dto.GenreResponseDto;
 import ru.otus.spring.homework.oke.formatters.utils.IndentUtils;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
 public class SimpleGenreFormatter implements GenreFormatter {
 
     @Override
-    public String formatGenre(Genre genre, int indent) {
+    public String formatGenre(GenreResponseDto genre, int indent) {
         String indentPrefix = IndentUtils.getEntityPrefix(indent);
         String linePrefix = IndentUtils.getEntityLinePrefix(indent);
         StringBuilder builder = new StringBuilder();
@@ -25,7 +25,7 @@ public class SimpleGenreFormatter implements GenreFormatter {
     }
 
     @Override
-    public String formatGenres(List<Genre> genres, int indent) {
+    public String formatGenres(List<GenreResponseDto> genres, int indent) {
         StringBuilder builder = new StringBuilder();
         genres.forEach(g -> {
             builder.append(this.formatGenre(g, indent) + System.lineSeparator());

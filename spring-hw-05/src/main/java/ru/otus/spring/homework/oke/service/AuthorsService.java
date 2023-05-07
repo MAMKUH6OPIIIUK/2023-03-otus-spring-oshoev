@@ -1,15 +1,16 @@
 package ru.otus.spring.homework.oke.service;
 
-import ru.otus.spring.homework.oke.domain.Author;
+import ru.otus.spring.homework.oke.dto.AuthorRequestDto;
+import ru.otus.spring.homework.oke.dto.AuthorResponseDto;
 
 import java.util.List;
 
 public interface AuthorsService {
-    Author create(String name, String middleName, String patronymic, String surname);
+    AuthorResponseDto create(AuthorRequestDto authorRequestDto);
 
-    Author findById(long id);
+    AuthorResponseDto findById(long id);
 
-    List<Author> findAll();
+    List<AuthorResponseDto> findAll();
 
     void deleteById(long id);
 }

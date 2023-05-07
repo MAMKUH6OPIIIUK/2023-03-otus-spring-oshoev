@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
-import ru.otus.spring.homework.oke.domain.Genre;
+import ru.otus.spring.homework.oke.dto.GenreRequestDto;
+import ru.otus.spring.homework.oke.dto.GenreResponseDto;
 import ru.otus.spring.homework.oke.formatters.GenreFormatter;
 import ru.otus.spring.homework.oke.service.GenresService;
 
@@ -21,7 +22,7 @@ public class GenresCLI {
 
     @ShellMethod(value = "Получить все существующие жанры книг", key = {"gag", "get all genres"})
     public String getAllGenres() {
-        List<Genre> genres = this.genresService.findAll();
+        List<GenreResponseDto> genres = this.genresService.findAll();
         return this.genreFormatter.formatGenres(genres, 0);
     }
 
@@ -29,7 +30,8 @@ public class GenresCLI {
     public String createGenre(@ShellOption(help = "Название жанра. Должно быть уникальным", value = {"n", "name"})
                               @Size(min = 1, max = 500)
                                       String name) {
-        Genre createdGenre = this.genresService.create(name);
+        GenreRequestDto requestDto = new GenreRequestDto(name);
+        GenreResponseDto createdGenre = this.genresService.create(requestDto);
         return "Успешно добавлен жанр! " + this.genreFormatter.formatGenre(createdGenre, 0);
     }
 

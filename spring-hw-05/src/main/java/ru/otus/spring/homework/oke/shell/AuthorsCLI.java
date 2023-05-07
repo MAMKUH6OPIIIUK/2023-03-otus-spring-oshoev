@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
-import ru.otus.spring.homework.oke.domain.Author;
+import ru.otus.spring.homework.oke.dto.AuthorRequestDto;
+import ru.otus.spring.homework.oke.dto.AuthorResponseDto;
 import ru.otus.spring.homework.oke.formatters.AuthorFormatter;
 import ru.otus.spring.homework.oke.service.AuthorsService;
 
@@ -21,7 +22,7 @@ public class AuthorsCLI {
 
     @ShellMethod(value = "Команда поиска всех существующих авторов книг", key = {"gaa", "get all authors"})
     public String getAllAuthors() {
-        List<Author> authors = this.authorsService.findAll();
+        List<AuthorResponseDto> authors = this.authorsService.findAll();
         return this.authorsFormatter.formatAuthors(authors, 0);
     }
 
@@ -40,7 +41,8 @@ public class AuthorsCLI {
                                @ShellOption(help = "Фамилия", value = {"sn", "surname"})
                                @Size(min = 1, max = 255)
                                        String surname) {
-        Author createdAuthor = this.authorsService.create(name, middleName, patronymic, surname);
+        AuthorRequestDto requestDto = new AuthorRequestDto(name, middleName, patronymic, surname);
+        AuthorResponseDto createdAuthor = this.authorsService.create(requestDto);
         return "Успешно добавлен автор! " + this.authorsFormatter.formatAuthor(createdAuthor, 0);
     }
 

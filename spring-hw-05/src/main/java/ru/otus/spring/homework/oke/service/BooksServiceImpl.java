@@ -1,9 +1,8 @@
 package ru.otus.spring.homework.oke.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.spring.homework.oke.dao.AuthorsDao;
 import ru.otus.spring.homework.oke.dao.BooksDao;
 import ru.otus.spring.homework.oke.dao.GenresDao;
@@ -16,6 +15,7 @@ import ru.otus.spring.homework.oke.exceptions.NotFoundException;
 import ru.otus.spring.homework.oke.mappers.BookMapper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,60 +35,108 @@ public class BooksServiceImpl implements BooksService {
     private final BookMapper bookMapper;
 
     @Override
+    @Transactional
     public BookResponseDto create(BookRequestDto bookRequestDto) {
-        try {
-            Book bookForCreate = bookMapper.mapToBook(bookRequestDto);
-            Book createdBook = this.booksDao.create(bookForCreate);
-            BookResponseDto result = collectSingleResponseDto(createdBook);
-            return result;
-        } catch (DataIntegrityViolationException e) {
-            String errorMessage = "Указанный жанр или автор не существует. Книга может иметь только существующие " +
-                    "жанры и автора";
-            throw new NotFoundException(errorMessage, e);
-        }
+        Author bookAuthor = this.validateAuthor(bookRequestDto.getAuthorId());
+        List<Genre> bookGenres = this.validateGenres(bookRequestDto.getGenreIds());
+        Book bookForCreate = bookMapper.mapToBook(bookRequestDto);
+        Book createdBook = this.booksDao.create(bookForCreate);
+        BookResponseDto result = this.bookMapper.mapToBookResponseDto(createdBook, bookAuthor, bookGenres);
+        return result;
     }
 
     @Override
-    public BookResponseDto update(long id, BookRequestDto bookRequestDto) {
-        try {
-            Book bookForUpdate = bookMapper.mapToBook(id, bookRequestDto);
-            Book updatedBook = this.booksDao.update(bookForUpdate);
-            BookResponseDto result = collectSingleResponseDto(updatedBook);
-            return result;
-        } catch (IncorrectResultSizeDataAccessException e) {
-            throw new NotFoundException("Книга с указанным идентификатором " + id + " не найдена");
-        } catch (DataIntegrityViolationException e) {
-            String errorMessage = "Указанный жанр или автор не существует. Книга может иметь только существующие " +
-                    "жанры и автора";
-            throw new NotFoundException(errorMessage, e);
-        }
+    @Transactional
+    public void update(long id, BookRequestDto bookRequestDto) {
+        this.validateBook(id);
+        this.validateAuthor(bookRequestDto.getAuthorId());
+        this.validateGenres(bookRequestDto.getGenreIds());
+        Book bookForUpdate = bookMapper.mapToBook(id, bookRequestDto);
+        this.booksDao.update(bookForUpdate);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookResponseDto findById(long id) {
-        try {
-            Book foundBook = this.booksDao.findById(id);
-            BookResponseDto result = collectSingleResponseDto(foundBook);
-            return result;
-        } catch (IncorrectResultSizeDataAccessException e) {
-            throw new NotFoundException("Книга с указанным идентификатором " + id + " не найдена");
-        }
+        Book foundBook = this.validateBook(id);
+        BookResponseDto result = collectSingleResponseDto(foundBook);
+        return result;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookResponseDto> findAll() {
         List<Book> foundBooks = this.booksDao.findAll();
         if (foundBooks.isEmpty()) {
-            return new ArrayList<>();
-        } else {
-            List<BookResponseDto> result = collectListResponseDto(foundBooks);
-            return result;
+            return Collections.EMPTY_LIST;
         }
+        List<BookResponseDto> result = collectListResponseDto(foundBooks);
+        return result;
     }
 
     @Override
+    @Transactional
     public void deleteById(long id) {
         this.booksDao.deleteById(id);
+    }
+
+    /**
+     * Метод проверки существования книги
+     *
+     * @param id иденнификатор книги
+     * @return найденная книга
+     * @throws NotFoundException если книга не найдена по идентификатору
+     */
+    private Book validateBook(long id) {
+        try {
+            Book foundBook = this.booksDao.findById(id);
+            return foundBook;
+        } catch (Exception e) {
+            throw new NotFoundException("Книга с указанным идентификатором " + id + " не найдена", e);
+        }
+    }
+
+    /**
+     * Метод проверки существования автора книги
+     *
+     * @param authorId идентификатор автора книги
+     * @return найденный автор
+     * @throws NotFoundException если автор по указанному идентификатору не найден
+     */
+    private Author validateAuthor(long authorId) {
+        try {
+            Author author = this.authorsDao.findById(authorId);
+            return author;
+        } catch (Exception e) {
+            throw new NotFoundException("Автор с указанным идентификатором " + authorId + " не найден", e);
+        }
+    }
+
+    /**
+     * Метод проверки существования жанров книги
+     *
+     * @param genreIds набор идентификаторов жанров
+     * @return список найденных по идентификаторам жанров, если все они найдены
+     * @throws NotFoundException если набор идентификаторов жанров не пуст и хотя бы для одного из идентификаторов не
+     *                           найден жанр
+     */
+    private List<Genre> validateGenres(Set<Long> genreIds) {
+        if (genreIds == null || genreIds.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+        List<Genre> foundGenres = this.genresDao.findByIds(genreIds);
+        int foundCount = foundGenres.size();
+        int requiredCount = genreIds.size();
+        if (foundCount < requiredCount) {
+            Set<Long> foundIds = foundGenres.stream().map(Genre::getId).collect(Collectors.toSet());
+            Set<Long> notFoundIds = genreIds
+                    .stream()
+                    .filter(genreId -> !foundIds.contains(genreId)).collect(Collectors.toSet());
+            String errorMessage = "Жанры с идентификаторами: " + notFoundIds + " не найдены. Книга может иметь " +
+                    "только существующие жанры";
+            throw new NotFoundException(errorMessage);
+        }
+        return foundGenres;
     }
 
     private BookResponseDto collectSingleResponseDto(Book book) {

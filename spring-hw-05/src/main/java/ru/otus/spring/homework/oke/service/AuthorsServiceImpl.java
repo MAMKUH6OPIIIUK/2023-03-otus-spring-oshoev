@@ -2,11 +2,12 @@ package ru.otus.spring.homework.oke.service;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.spring.homework.oke.dao.AuthorsDao;
+import ru.otus.spring.homework.oke.dao.BooksDao;
 import ru.otus.spring.homework.oke.domain.Author;
+import ru.otus.spring.homework.oke.domain.Book;
 import ru.otus.spring.homework.oke.dto.AuthorRequestDto;
 import ru.otus.spring.homework.oke.dto.AuthorResponseDto;
 import ru.otus.spring.homework.oke.exceptions.AuthorBooksFoundException;
@@ -21,9 +22,12 @@ import java.util.stream.Collectors;
 public class AuthorsServiceImpl implements AuthorsService {
     private final AuthorsDao authorsDao;
 
+    private final BooksDao booksDao;
+
     private final AuthorMapper authorMapper;
 
     @Override
+    @Transactional
     public AuthorResponseDto create(AuthorRequestDto authorRequestDto) {
         Author authorForCreate = this.authorMapper.mapToAuthor(authorRequestDto);
         Author createdAuthor = this.authorsDao.create(authorForCreate);
@@ -31,28 +35,30 @@ public class AuthorsServiceImpl implements AuthorsService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AuthorResponseDto findById(long id) {
         try {
             Author author = this.authorsDao.findById(id);
             return this.authorMapper.mapToAuthorResponseDto(author);
-        } catch (IncorrectResultSizeDataAccessException e) {
+        } catch (Exception e) {
             throw new NotFoundException("Автор с указанным идентификатором " + id + " не найден");
         }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AuthorResponseDto> findAll() {
         List<Author> authors = this.authorsDao.findAll();
         return authors.stream().map(authorMapper::mapToAuthorResponseDto).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional
     public void deleteById(long id) {
-        try {
-            this.authorsDao.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            String errorMessage = "Найдены книги данного автора. Сначала удалите их";
-            throw new AuthorBooksFoundException(errorMessage, e);
+        List<Book> authorBooks = this.booksDao.findByAuthorId(id);
+        if (authorBooks.size() != 0) {
+            throw new AuthorBooksFoundException("Найдены книги данного автора. Сначала удалите их");
         }
+        this.authorsDao.deleteById(id);
     }
 }

@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -58,6 +59,14 @@ public class JdbcGenresDao implements GenresDao {
                 "from genres g inner join books_genres bg on (g.id = bg.genre_id) " +
                 "where bg.book_id = :book_id";
         return jdbc.query(sql, Collections.singletonMap("book_id", bookId), new GenreMapper());
+    }
+
+    @Override
+    public List<Genre> findByIds(Set<Long> ids) {
+        String sql = "select id, name from genres where id in (:ids)";
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("ids", ids);
+        return jdbc.query(sql, parameters, new GenreMapper());
     }
 
     @Override

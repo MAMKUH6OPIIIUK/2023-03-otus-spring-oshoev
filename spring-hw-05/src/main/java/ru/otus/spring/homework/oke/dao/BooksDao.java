@@ -8,9 +8,11 @@ public interface BooksDao {
 
     Book create(Book book);
 
-    Book update(Book book);
+    void update(Book book);
 
     Book findById(long id);
+
+    List<Book> findByAuthorId(long authorId);
 
     List<Book> findAll();
 

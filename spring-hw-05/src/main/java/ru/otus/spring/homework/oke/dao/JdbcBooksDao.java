@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.spring.homework.oke.dao.ext.BookGenreRelation;
 import ru.otus.spring.homework.oke.domain.Book;
 
@@ -34,7 +33,6 @@ public class JdbcBooksDao implements BooksDao {
      * @param book книга для создания
      * @return созданная книга с установленным идентификатором
      */
-    @Transactional
     @Override
     public Book create(Book book) {
         String sql = "insert into books (title, description, author_id)  values " +
@@ -57,11 +55,9 @@ public class JdbcBooksDao implements BooksDao {
      * новые автор и жанры книги должны существовать в базе данных
      *
      * @param book данные книги для обновления
-     * @return обновленная книга
      */
-    @Transactional
     @Override
-    public Book update(Book book) {
+    public void update(Book book) {
         String sql = "update books set title = :title, description = :description, " +
                 "author_id = :author_id where id = :id";
         Map<String, Object> parameters = new HashMap<>();
@@ -72,7 +68,6 @@ public class JdbcBooksDao implements BooksDao {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource(parameters);
         jdbc.update(sql, parameterSource);
         updateGenresRelations(book.getId(), book.getGenreIds());
-        return book;
     }
 
     /**
@@ -94,6 +89,22 @@ public class JdbcBooksDao implements BooksDao {
     }
 
     /**
+     * Метод выполняет поиск всех книг, имеющих определенного автора
+     * Поиск выполняется в 2 запроса:
+     * 1. Запрос всех книг по идентификатору автора
+     * 2. Запрос всех связей книг с жанрами
+     *
+     * @return список найденных книг
+     */
+    public List<Book> findByAuthorId(long authorId) {
+        List<BookGenreRelation> relations = this.getAllGenresRelations();
+        String sql = "select b.id, b.title, b.description, b.author_id from books b where b.author_id = :author_id";
+        List<Book> foundBooks = jdbc.query(sql, Collections.singletonMap("author_id", authorId), new BookMapper());
+        this.mergeBooksInfo(foundBooks, relations);
+        return foundBooks;
+    }
+
+    /**
      * Метод выполняет поиск всех книг
      * Поиск выполняется в 2 запроса:
      * 1. Запрос всех книг
@@ -110,7 +121,6 @@ public class JdbcBooksDao implements BooksDao {
         return books;
     }
 
-    @Transactional
     @Override
     public void deleteById(long id) {
         deleteGenresRelations(id);

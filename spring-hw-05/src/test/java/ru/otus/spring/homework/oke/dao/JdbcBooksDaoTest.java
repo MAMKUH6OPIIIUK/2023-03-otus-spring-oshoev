@@ -105,6 +105,16 @@ public class JdbcBooksDaoTest {
         assertThat(actualBook).isEqualTo(expectedBook);
     }
 
+    @DisplayName("возвращать ожидаемый список книг по идентификатору автора")
+    @Test
+    void shouldReturnExpectedBookListByAuthorId() {
+        long authorId = 2;
+        Book expectedBook = new Book(3, "Книга3", "Описание3", authorId,
+                Set.of(2L));
+        List<Book> actualBooks = this.booksDao.findByAuthorId(authorId);
+        assertThat(actualBooks).containsExactlyInAnyOrder(expectedBook);
+    }
+
     @DisplayName("возвращать ожидаемый список книг")
     @Test
     void shouldReturnExpectedBookList() {

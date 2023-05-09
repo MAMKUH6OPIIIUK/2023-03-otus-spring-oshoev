@@ -9,6 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import ru.otus.spring.homework.oke.domain.Genre;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -69,6 +70,19 @@ public class JdbcGenresDaoTest {
         Genre expectedGenre = new Genre(2, "Жанр2");
         List<Genre> actualBookGenres = this.genresDao.findAllByBookId(EXISTING_BOOK_ID);
         assertThat(actualBookGenres).containsExactlyInAnyOrder(expectedGenre);
+    }
+
+    @DisplayName("возвращать ожидаемый список жанров по набору их идентификаторов")
+    @Test
+    void shouldReturnExpectedGenresByIds() {
+        long genreId1 = 2;
+        long genreId2 = 3;
+        Genre expectedGenre1 = new Genre(genreId1, "Жанр2");
+        Genre expectedGenre2 = new Genre(genreId2, "Жанр3");
+        Set<Long> ids = Set.of(genreId1, genreId2);
+        List<Genre> actualGenres = this.genresDao.findByIds(ids);
+        assertThat(actualGenres).containsExactlyInAnyOrder(expectedGenre1, expectedGenre2);
+
     }
 
     @DisplayName("удалять заданный жанр по его id")

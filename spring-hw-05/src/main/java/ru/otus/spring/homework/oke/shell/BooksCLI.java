@@ -65,8 +65,8 @@ public class BooksCLI {
             genresSet.add(genreId);
         }
         BookRequestDto bookRequestDto = new BookRequestDto(title, description, authorId, genresSet);
-        BookResponseDto updatedBook = this.booksService.update(id, bookRequestDto);
-        return "Успешно обновлена книга! " + this.bookFormatter.formatBook(updatedBook, 0);
+        this.booksService.update(id, bookRequestDto);
+        return "Книга успешно обновлена!";
     }
 
     @ShellMethod(value = "Удалить книгу", key = {"rb", "remove book"})

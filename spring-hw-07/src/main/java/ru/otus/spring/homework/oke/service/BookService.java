@@ -8,7 +8,7 @@ import java.util.List;
 public interface BookService {
     BookResponseDto create(BookRequestDto bookRequestDto);
 
-    void update(Long id, BookRequestDto bookRequestDto);
+    void update(BookRequestDto bookRequestDto);
 
     BookResponseDto findById(Long id);
 

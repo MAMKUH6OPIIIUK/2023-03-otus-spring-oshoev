@@ -10,14 +10,9 @@ import ru.otus.spring.homework.oke.model.Comment;
 public class CommentMapper {
     public Comment mapToComment(CommentRequestDto requestDto, Book commentBook) {
         Comment comment = new Comment();
+        comment.setId(requestDto.getId());
         comment.setText(requestDto.getText());
         comment.setBook(commentBook);
-        return comment;
-    }
-
-    public Comment mapToComment(Long id, CommentRequestDto requestDto, Book commentBook) {
-        Comment comment = mapToComment(requestDto, commentBook);
-        comment.setId(id);
         return comment;
     }
 

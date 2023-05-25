@@ -22,6 +22,7 @@ public class BookMapper {
 
     public Book mapToBook(BookRequestDto bookRequestDto, Author author, Collection<Genre> genres) {
         Book book = new Book();
+        book.setId(bookRequestDto.getId());
         book.setTitle(bookRequestDto.getTitle());
         book.setDescription(bookRequestDto.getDescription());
         book.setAuthor(author);
@@ -29,9 +30,34 @@ public class BookMapper {
         return book;
     }
 
-    public Book mapToBook(Long id, BookRequestDto bookRequestDto, Author author, Collection<Genre> genres) {
-        Book book = mapToBook(bookRequestDto, author, genres);
-        book.setId(id);
+    /**
+     * Метод объединяет данные существующей книги с данными из dto, а также новым автором и новой коллекцией жанров
+     * Объединение жанров книги выполняется по следующему принципу:
+     * - удалить все жанры в существующей книге, которых нет в новой коллекции жанров
+     * - добавить к жанрам существующей книги все жанры, которых в ней ещё не было
+     * В силу отсутствия методов equals и hashcode у класса Genre, дополнение\удаление выпоняется при помощи стримов.
+     * <p>
+     * Метод меняет переданный объект book
+     *
+     * @param book существующая в книга
+     * @param bookRequestDto запрос на изменение книги с базовой информацией о ней
+     * @param newAuthor новый автор книги (должен существовать)
+     * @param newGenres новая коллекция жанров книги (должны существовать)
+     * @return измененный в процессе работы аргумент book со всеми обновленными полями
+     */
+    public Book mergeBookInfo(Book book, BookRequestDto bookRequestDto, Author newAuthor,
+                              Collection<Genre> newGenres) {
+        book.setId(bookRequestDto.getId());
+        book.setTitle(bookRequestDto.getTitle());
+        book.setDescription(bookRequestDto.getDescription());
+        book.setAuthor(newAuthor);
+        Set<Genre> bookGenres = book.getGenres();
+        Set<Long> oldGenreIds = bookGenres.stream().map(Genre::getId).collect(Collectors.toSet());
+        Set<Long> newGenreIds = newGenres.stream().map(Genre::getId).collect(Collectors.toSet());
+        bookGenres.removeIf(genre -> !newGenreIds.contains(genre.getId()));
+        newGenres.stream()
+                .filter(newGenre -> !oldGenreIds.contains(newGenre.getId()))
+                .forEach(newGenre -> bookGenres.add(newGenre));
         return book;
     }
 

@@ -19,7 +19,11 @@ import ru.otus.spring.homework.oke.repository.AuthorRepository;
 import ru.otus.spring.homework.oke.repository.BookRepository;
 import ru.otus.spring.homework.oke.repository.GenreRepository;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -96,9 +100,12 @@ public class BookServiceImplTest {
         Genre genre1 = new Genre(genreId1, "Жанр1");
         long genreId2 = 4;
         Genre genre2 = new Genre(genreId2, "Жанр4");
-        BookRequestDto bookRequestDto = new BookRequestDto(bookTitle, bookDescription, authorId,
+        BookRequestDto bookRequestDto = new BookRequestDto(bookId, bookTitle, bookDescription, authorId,
                 Set.of(genreId1, genreId2));
-        Book expectedBookArg = new Book(bookId, bookTitle, bookDescription, author, Set.of(genre1, genre2));
+        Set<Genre> bookGenres = new HashSet<>();
+        bookGenres.add(genre1);
+        bookGenres.add(genre2);
+        Book expectedBookArg = new Book(bookId, bookTitle, bookDescription, author, bookGenres);
         Book expectedBookFromBookDao = expectedBookArg;
         Optional<Author> authorFromAuthorsDao = Optional.of(author);
         List<Genre> genresFromGenresDao = List.of(genre1, genre2);
@@ -108,7 +115,7 @@ public class BookServiceImplTest {
         given(genreRepository.findByIdIn(any())).willReturn(genresFromGenresDao);
         given(authorRepository.findById(anyLong())).willReturn(authorFromAuthorsDao);
 
-        this.bookService.update(bookId, bookRequestDto);
+        this.bookService.update(bookRequestDto);
 
         verify(bookRepository, times(1)).save(ArgumentMatchers.refEq(expectedBookArg));
         verify(authorRepository, times(1)).findById(authorId);
@@ -208,10 +215,10 @@ public class BookServiceImplTest {
     @Test
     public void shouldThrowNotFoundExceptionWhenUpdateNonExistingBook() {
         long nonExistingBookId = 3;
-        BookRequestDto requestDto = new BookRequestDto("Любое", "Любое", 1L, Set.of(1L));
+        BookRequestDto requestDto = new BookRequestDto(nonExistingBookId, "Любое", "Любое", 1L, Set.of(1L));
         given(bookRepository.findById(anyLong())).willReturn(Optional.ofNullable(null));
         assertThatThrownBy(() -> {
-            bookService.update(nonExistingBookId, requestDto);
+            bookService.update(requestDto);
         })
                 .isInstanceOf(NotFoundException.class);
     }
@@ -223,13 +230,14 @@ public class BookServiceImplTest {
         Author existingAuthor = new Author(1L, "Любое", null, "Любое", "Любая");
         Book bookFromRepository = new Book(existingBookId, "Любое", "Любое", existingAuthor, new HashSet<>());
         long nonExistingAuthorId = 4;
-        BookRequestDto requestDto = new BookRequestDto("Любое", "Любое", nonExistingAuthorId, new HashSet<>());
+        BookRequestDto requestDto = new BookRequestDto(existingBookId, "Любое", "Любое",
+                nonExistingAuthorId, new HashSet<>());
 
         given(authorRepository.findById(nonExistingAuthorId)).willReturn(Optional.ofNullable(null));
         given(genreRepository.findByIdIn(any())).willReturn(Collections.EMPTY_LIST);
         given(bookRepository.findById(anyLong())).willReturn(Optional.of(bookFromRepository));
 
-        assertThatThrownBy(() -> bookService.update(existingBookId, requestDto)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> bookService.update(requestDto)).isInstanceOf(NotFoundException.class);
     }
 
     @DisplayName("бросить исключение NotFoundException при попытке обновить книгу с указанием несуществующего жанра")
@@ -240,7 +248,7 @@ public class BookServiceImplTest {
         Book bookFromRepository = new Book(existingBookId, "Любое", "Любое", existingAuthor, new HashSet<>());
         long existingGenreId = 1;
         long nonExistingGenreId = 2;
-        BookRequestDto requestDto = new BookRequestDto("Любое", "Любое", 1L,
+        BookRequestDto requestDto = new BookRequestDto(existingBookId,"Любое", "Любое", 1L,
                 Set.of(existingGenreId, nonExistingGenreId));
         Genre existingGenre = new Genre(existingGenreId, "Любое");
         List<Genre> genresFromRepository = List.of(existingGenre);
@@ -249,7 +257,7 @@ public class BookServiceImplTest {
         given(genreRepository.findByIdIn(any())).willReturn(genresFromRepository);
         given(bookRepository.findById(anyLong())).willReturn(Optional.of(bookFromRepository));
 
-        assertThatThrownBy(() -> bookService.update(existingBookId, requestDto)).isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> bookService.update(requestDto)).isInstanceOf(NotFoundException.class);
     }
 
 }

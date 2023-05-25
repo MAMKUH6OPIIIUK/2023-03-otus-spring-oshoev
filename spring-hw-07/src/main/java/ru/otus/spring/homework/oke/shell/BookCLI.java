@@ -64,8 +64,8 @@ public class BookCLI {
         for (Long genreId : genreIds) {
             genresSet.add(genreId);
         }
-        BookRequestDto bookRequestDto = new BookRequestDto(title, description, authorId, genresSet);
-        this.bookService.update(id, bookRequestDto);
+        BookRequestDto bookRequestDto = new BookRequestDto(id, title, description, authorId, genresSet);
+        this.bookService.update(bookRequestDto);
         return "Книга успешно обновлена!";
     }
 

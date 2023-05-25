@@ -43,11 +43,11 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public void update(Long id, BookRequestDto bookRequestDto) {
-        this.validateBook(id);
-        Author bookAuthor = this.validateAuthor(bookRequestDto.getAuthorId());
-        List<Genre> bookGenres = this.validateGenres(bookRequestDto.getGenreIds());
-        Book bookForUpdate = bookMapper.mapToBook(id, bookRequestDto, bookAuthor, bookGenres);
+    public void update(BookRequestDto bookRequestDto) {
+        Book bookForUpdate = this.validateBook(bookRequestDto.getId());
+        Author newBookAuthor = this.validateAuthor(bookRequestDto.getAuthorId());
+        List<Genre> newBookGenres = this.validateGenres(bookRequestDto.getGenreIds());
+        bookForUpdate = this.bookMapper.mergeBookInfo(bookForUpdate, bookRequestDto, newBookAuthor, newBookGenres);
         this.bookRepository.save(bookForUpdate);
     }
 

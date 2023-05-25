@@ -1,17 +1,22 @@
 package ru.otus.spring.homework.oke.repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import ru.otus.spring.homework.oke.model.Book;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
 
     List<Book> findByAuthorId(Long authorId);
 
     @Override
-    @Query("select distinct b from Book b join fetch b.author")
+    @EntityGraph(value = "book-author-entity-graph")
+    Optional<Book> findById(Long id);
+
+    @Override
+    @EntityGraph(value = "book-author-entity-graph")
     List<Book> findAll();
 
 }

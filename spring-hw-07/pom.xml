@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>spring-hw-07</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <name>spring-hw-07</name>
     <description>Otus homework #7</description>
 
@@ -22,7 +22,6 @@
         <checkstyle.config.url>https://raw.githubusercontent.com/OtusTeam/Spring/master/checkstyle.xml</checkstyle.config.url>
         <minimal.maven.version>3.3.9</minimal.maven.version>
         <spring.shell.version>3.0.0</spring.shell.version>
-        <h2.version>2.1.214</h2.version>
     </properties>
     <dependencies>
         <dependency>
@@ -37,7 +36,6 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>${h2.version}</version>
         </dependency>
 
         <dependency>

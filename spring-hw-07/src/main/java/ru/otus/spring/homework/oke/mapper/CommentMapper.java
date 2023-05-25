@@ -16,6 +16,12 @@ public class CommentMapper {
         return comment;
     }
 
+    public Comment mergeCommentInfo(Comment comment, CommentRequestDto requestDto) {
+        String newText = requestDto.getText();
+        comment.setText(newText);
+        return comment;
+    }
+
     public CommentResponseDto mapToCommentResponseDto(Comment comment) {
         CommentResponseDto dto = new CommentResponseDto(comment.getId(), comment.getText());
         return dto;

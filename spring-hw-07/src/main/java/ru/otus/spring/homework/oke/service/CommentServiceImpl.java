@@ -37,9 +37,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void update(CommentRequestDto commentRequestDto) {
-        this.validateComment(commentRequestDto.getId());
-        Book commentBook = this.validateBook(commentRequestDto.getBookId());
-        Comment commentForUpdate = this.commentMapper.mapToComment(commentRequestDto, commentBook);
+        Comment commentForUpdate = this.validateComment(commentRequestDto.getId());
+        commentForUpdate = this.commentMapper.mergeCommentInfo(commentForUpdate, commentRequestDto);
         this.commentRepository.save(commentForUpdate);
     }
 

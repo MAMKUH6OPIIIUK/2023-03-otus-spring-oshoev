@@ -12,6 +12,11 @@ public class CommentRequestDto {
 
     private Long bookId;
 
+    public CommentRequestDto(Long id, String text) {
+        this.id = id;
+        this.text = text;
+    }
+
     public CommentRequestDto(String text, Long bookId) {
         this.text = text;
         this.bookId = bookId;

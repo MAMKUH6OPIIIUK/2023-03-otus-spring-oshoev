@@ -47,7 +47,6 @@ public class BookMapper {
      */
     public Book mergeBookInfo(Book book, BookRequestDto bookRequestDto, Author newAuthor,
                               Collection<Genre> newGenres) {
-        book.setId(bookRequestDto.getId());
         book.setTitle(bookRequestDto.getTitle());
         book.setDescription(bookRequestDto.getDescription());
         book.setAuthor(newAuthor);

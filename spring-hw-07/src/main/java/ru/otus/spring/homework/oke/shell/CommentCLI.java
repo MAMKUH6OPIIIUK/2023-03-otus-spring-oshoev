@@ -37,11 +37,8 @@ public class CommentCLI {
                                         Long id,
                                 @ShellOption(help = "Текст комментария", value = {"t", "text"})
                                 @Size(min = 1, max = 1000)
-                                        String text,
-                                @ShellOption(help = "Идентификатор книги", value = {"bi", "bookId"})
-                                @Positive
-                                        Long bookId) {
-        CommentRequestDto commentRequestDto = new CommentRequestDto(id, text, bookId);
+                                        String text) {
+        CommentRequestDto commentRequestDto = new CommentRequestDto(id, text);
         this.commentService.update(commentRequestDto);
         return "Успешно обновлен комментарий!";
     }

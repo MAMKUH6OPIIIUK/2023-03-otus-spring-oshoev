@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>spring-hw-07</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
     <name>spring-hw-07</name>
     <description>Otus homework #7</description>
 

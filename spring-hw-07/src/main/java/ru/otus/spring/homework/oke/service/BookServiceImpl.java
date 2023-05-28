@@ -34,7 +34,7 @@ public class BookServiceImpl implements BookService {
     @Transactional
     public BookResponseDto create(BookRequestDto bookRequestDto) {
         Author bookAuthor = this.validateAuthor(bookRequestDto.getAuthorId());
-        List<Genre> bookGenres = this.validateGenres(bookRequestDto.getGenreIds());
+        Set<Genre> bookGenres = this.validateGenres(bookRequestDto.getGenreIds());
         Book bookForCreate = bookMapper.mapToBook(bookRequestDto, bookAuthor, bookGenres);
         Book createdBook = this.bookRepository.save(bookForCreate);
         BookResponseDto result = this.bookMapper.mapToBookResponseDto(createdBook);
@@ -46,8 +46,8 @@ public class BookServiceImpl implements BookService {
     public void update(BookRequestDto bookRequestDto) {
         Book bookForUpdate = this.validateBook(bookRequestDto.getId());
         Author newBookAuthor = this.validateAuthor(bookRequestDto.getAuthorId());
-        List<Genre> newBookGenres = this.validateGenres(bookRequestDto.getGenreIds());
-        bookForUpdate = this.bookMapper.mergeBookInfo(bookForUpdate, bookRequestDto, newBookAuthor, newBookGenres);
+        Set<Genre> newBookGenres = this.validateGenres(bookRequestDto.getGenreIds());
+        this.bookMapper.mergeBookInfo(bookForUpdate, bookRequestDto, newBookAuthor, newBookGenres);
         this.bookRepository.save(bookForUpdate);
     }
 
@@ -110,15 +110,15 @@ public class BookServiceImpl implements BookService {
      * Метод проверки существования жанров книги
      *
      * @param genreIds набор идентификаторов жанров
-     * @return список найденных по идентификаторам жанров, если все они найдены
+     * @return набор найденных по идентификаторам жанров, если все они найдены
      * @throws NotFoundException если набор идентификаторов жанров не пуст и хотя бы для одного из идентификаторов не
      *                           найден жанр
      */
-    private List<Genre> validateGenres(Set<Long> genreIds) {
+    private Set<Genre> validateGenres(Set<Long> genreIds) {
         if (genreIds == null || genreIds.isEmpty()) {
-            return Collections.EMPTY_LIST;
+            return Collections.EMPTY_SET;
         }
-        List<Genre> foundGenres = this.genreRepository.findByIdIn(genreIds);
+        Set<Genre> foundGenres = this.genreRepository.findByIdIn(genreIds);
         int foundCount = foundGenres.size();
         int requiredCount = genreIds.size();
         if (foundCount < requiredCount) {

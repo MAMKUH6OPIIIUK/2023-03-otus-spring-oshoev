@@ -63,13 +63,13 @@ public class GenreRepositoryTest {
                 .containsExactlyInAnyOrder(expectedGenre1, expectedGenre2, expectedGenre3);
     }
 
-    @DisplayName("возвращать ожидаемый список жанров по набору их идентификаторов")
+    @DisplayName("возвращать ожидаемый набор жанров по набору их идентификаторов")
     @Test
     void shouldReturnExpectedGenresByIds() {
         Genre expectedGenre1 = em.find(Genre.class, FIRST_GENRE_ID);
         Genre expectedGenre2 = em.find(Genre.class, SECOND_GENRE_ID);
         Set<Long> ids = Set.of(FIRST_GENRE_ID, SECOND_GENRE_ID);
-        List<Genre> actualGenres = this.genreRepository.findByIdIn(ids);
+        Set<Genre> actualGenres = this.genreRepository.findByIdIn(ids);
         assertThat(actualGenres)
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyInAnyOrder(expectedGenre1, expectedGenre2);

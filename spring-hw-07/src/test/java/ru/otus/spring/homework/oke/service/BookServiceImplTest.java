@@ -71,7 +71,7 @@ public class BookServiceImplTest {
                 "Отчество2", "Фамилия2");
         GenreResponseDto genreDto1 = new GenreResponseDto(genreId1, "Жанр1");
         GenreResponseDto genreDto2 = new GenreResponseDto(genreId2, "Жанр4");
-        List<Genre> genresFromGenresDao = List.of(genre1, genre2);
+        Set<Genre> genresFromGenresDao = Set.of(genre1, genre2);
         BookResponseDto expectedResult = new BookResponseDto(bookId, bookTitle, bookDescription, authorDto,
                 Set.of(genreDto1, genreDto2));
 
@@ -108,7 +108,7 @@ public class BookServiceImplTest {
         Book expectedBookArg = new Book(bookId, bookTitle, bookDescription, author, bookGenres);
         Book expectedBookFromBookDao = expectedBookArg;
         Optional<Author> authorFromAuthorsDao = Optional.of(author);
-        List<Genre> genresFromGenresDao = List.of(genre1, genre2);
+        Set<Genre> genresFromGenresDao = Set.of(genre1, genre2);
 
         given(bookRepository.save(any())).willReturn(expectedBookFromBookDao);
         given(bookRepository.findById(anyLong())).willReturn(Optional.of(expectedBookArg));
@@ -192,7 +192,7 @@ public class BookServiceImplTest {
         long nonExistingAuthorId = 4;
         BookRequestDto requestDto = new BookRequestDto("Любое", "Любое", nonExistingAuthorId, new HashSet<>());
         given(authorRepository.findById(nonExistingAuthorId)).willReturn(Optional.ofNullable(null));
-        given(genreRepository.findByIdIn(any())).willReturn(Collections.EMPTY_LIST);
+        given(genreRepository.findByIdIn(any())).willReturn(Collections.EMPTY_SET);
         assertThatThrownBy(() -> bookService.create(requestDto)).isInstanceOf(NotFoundException.class);
     }
 
@@ -205,7 +205,7 @@ public class BookServiceImplTest {
                 Set.of(existingGenreId, nonExistingGenreId));
         Author authorFromRepository = new Author(1L, "Любое", "Любое", null, "Любое");
         Genre existingGenre = new Genre(existingGenreId, "Любое");
-        List<Genre> genresFromRepository = List.of(existingGenre);
+        Set<Genre> genresFromRepository = Set.of(existingGenre);
         given(authorRepository.findById(anyLong())).willReturn(Optional.of(authorFromRepository));
         given(genreRepository.findByIdIn(any())).willReturn(genresFromRepository);
         assertThatThrownBy(() -> bookService.create(requestDto)).isInstanceOf(NotFoundException.class);
@@ -234,7 +234,7 @@ public class BookServiceImplTest {
                 nonExistingAuthorId, new HashSet<>());
 
         given(authorRepository.findById(nonExistingAuthorId)).willReturn(Optional.ofNullable(null));
-        given(genreRepository.findByIdIn(any())).willReturn(Collections.EMPTY_LIST);
+        given(genreRepository.findByIdIn(any())).willReturn(Collections.EMPTY_SET);
         given(bookRepository.findById(anyLong())).willReturn(Optional.of(bookFromRepository));
 
         assertThatThrownBy(() -> bookService.update(requestDto)).isInstanceOf(NotFoundException.class);
@@ -251,7 +251,7 @@ public class BookServiceImplTest {
         BookRequestDto requestDto = new BookRequestDto(existingBookId,"Любое", "Любое", 1L,
                 Set.of(existingGenreId, nonExistingGenreId));
         Genre existingGenre = new Genre(existingGenreId, "Любое");
-        List<Genre> genresFromRepository = List.of(existingGenre);
+        Set<Genre> genresFromRepository = Set.of(existingGenre);
 
         given(authorRepository.findById(anyLong())).willReturn(Optional.of(existingAuthor));
         given(genreRepository.findByIdIn(any())).willReturn(genresFromRepository);

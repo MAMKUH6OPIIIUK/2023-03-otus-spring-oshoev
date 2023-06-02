@@ -1,0 +1,26 @@
+spring:
+  data:
+    mongodb:
+      port: 0
+      database: oshoev-k-library-test
+      auto-index-creation: true
+  shell:
+    interactive:
+      enabled: false
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 4.0.2
+mongock:
+  runner-type: "InitializingBean"
+  #runner-type: "ApplicationRunner"
+  change-logs-scan-package:
+    - ru.otus.spring.homework.oke.changelog.test
+  mongo-db:
+    write-concern:
+      journal: false
+    read-concern: local
+logging:
+  level:
+    root: ERROR

@@ -1,0 +1,17 @@
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: oshoev-k-library
+      auto-index-creation: true
+  shell:
+    interactive:
+      enabled: true
+mongock:
+  runner-type: "InitializingBean"
+  change-logs-scan-package:
+    - ru.otus.spring.homework.oke.changelog
+logging:
+  level:
+    root: ERROR

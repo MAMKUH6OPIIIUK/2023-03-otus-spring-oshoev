@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{library-site-title}">Библиотека</title>
+    <link rel="icon" th:href="@{/images/favicon.ico}" href="../static/images/favicon.ico"/>
+    <link rel="stylesheet" th:href="@{/styles/library.css}" href="../static/styles/library.css">
+</head>
+<body>
+<h3 class="book-header" th:text="#{book-edit-header}">Введите или измените данные книги</h3>
+<form class="book-edit-form" action="books.html" th:action="@{${book.id == null ? '/book/create' : '/book/edit'}}"
+      th:method="post" th:object="${book}">
+    <input type="hidden" name="id" th:value="*{id}">
+    <div>
+        <label for="new-book-title" th:text="#{book-prompt-title}">Наименование книги:</label>
+        <input type="text" id="new-book-title" name="title" th:value="*{title}" value="Книга">
+        <div class="errors" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Некорректное наименование книги
+        </div>
+    </div>
+    <div>
+        <label for="new-book-description" th:text="#{book-prompt-description}">Аннотация:</label>
+        <input type="text" id="new-book-description" name="description" th:value="*{description}"
+               value="Описание книги">
+        <div class="errors" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Некорректная
+            аннотация книги
+        </div>
+    </div>
+    <div>
+        <label for="new-book-author" th:text="#{book-prompt-author}">Автор:</label>
+        <select id="new-book-author" name="authorId">
+            <option th:each="author : ${authors}"
+                    th:value="${author.id}"
+                    th:text="${author.fullName}"
+                    th:selected="(${author.id} eq *{authorId})">Василий Васильевич Пупкин
+            </option>
+        </select>
+        <div class="errors" th:if="${#fields.hasErrors('authorId')}" th:errors="*{authorId}">Укажите автора
+        </div>
+    </div>
+    <div>
+        <label for="new-book-author" th:text="#{book-prompt-genres}">Жанры:</label>
+        <select id="new-book-genres" name="genreIds" multiple="multiple">
+            <option th:each="genre : ${genres}"
+                    th:value="${genre.id}"
+                    th:text="${genre.name}"
+                    th:selected="${book.genreIds.contains(genre.id)}">Фантастика
+            </option>
+        </select>
+        <div class="errors" th:if="${#fields.hasErrors('genreIds')}" th:errors="*{genreIds}">Выберите жанры
+        </div>
+    </div>
+    <div>
+        <button type="submit" title="Принять" th:title="#{accept-button-title}" class="book-table-button">
+            <img th:src="@{/images/accept-icon.png}" src="../static/images/accept-icon.png" height="30"
+                 width="30" align="middle"/>
+        </button>
+        <a href="books.html" th:href="@{/book}">
+            <button type="button" title="Отменить" th:title="#{cancel-button-title}" class="book-table-button">
+                <img th:src="@{/images/cancel-icon.png}" src="../static/images/cancel-icon.png" height="30"
+                     width="30" align="middle"/>
+            </button>
+        </a>
+    </div>
+</form>
+</body>
+</html>

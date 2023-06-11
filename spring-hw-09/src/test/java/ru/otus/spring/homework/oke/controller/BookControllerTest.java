@@ -1,6 +1,5 @@
 package ru.otus.spring.homework.oke.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +29,16 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @DisplayName("Контроллер для работы с книгами ")
 @WebMvcTest(BookController.class)
@@ -221,12 +226,12 @@ public class BookControllerTest {
     @Test
     void shouldRejectInvalidBookCreation() throws Exception {
         BookRequestDto creatingBook = bookMapper.mapToBookRequestDto(DataGenerator.getFirstBook());
-        String invalidTooLongTitle = "";
+        StringBuilder invalidTooLongTitle = new StringBuilder();
         for (int i = 0; i <= 125; i++) {
-            invalidTooLongTitle += "long";
+            invalidTooLongTitle.append("long");
         }
         creatingBook.setId(null);
-        creatingBook.setTitle(invalidTooLongTitle);
+        creatingBook.setTitle(invalidTooLongTitle.toString());
         creatingBook.setGenreIds(Collections.EMPTY_LIST);
 
         mvc.perform(post("/book/create")
@@ -309,11 +314,11 @@ public class BookControllerTest {
     @Test
     void shouldRejectInvalidBookUpdate() throws Exception {
         BookRequestDto creatingBook = bookMapper.mapToBookRequestDto(DataGenerator.getFirstBook());
-        String invalidTooLongTitle = "";
+        StringBuilder invalidTooLongTitle = new StringBuilder();
         for (int i = 0; i <= 125; i++) {
-            invalidTooLongTitle += "long";
+            invalidTooLongTitle.append("long");
         }
-        creatingBook.setTitle(invalidTooLongTitle);
+        creatingBook.setTitle(invalidTooLongTitle.toString());
         creatingBook.setGenreIds(Collections.EMPTY_LIST);
 
         mvc.perform(post("/book/edit")

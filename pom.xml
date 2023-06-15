@@ -33,6 +33,7 @@
         <module>spring-hw-07</module>
         <module>spring-hw-08</module>
         <module>spring-hw-09</module>
+        <module>spring-hw-10</module>
     </modules>
     <!-- дополняем существующее управление версиями зависимостей из spring-boot-parent -->
     <dependencyManagement>

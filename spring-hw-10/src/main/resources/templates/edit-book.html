@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{library-site-title}">Библиотека</title>
+    <link rel="icon" th:href="@{/images/favicon.ico}" href="../static/images/favicon.ico"/>
+    <link rel="stylesheet" th:href="@{/styles/library.css}" href="../static/styles/library.css">
+    <script type="text/javascript" th:src="@{/scripts/rest-client.js}" src="../static/scripts/rest-client.js"></script>
+    <script type="text/javascript" th:src="@{/scripts/edit-book.js}" src="../static/scripts/edit-book.js"></script>
+</head>
+<body onload="renderBookEditionFormData()">
+<h3 class="book-header" th:text="#{book-edit-header}">Введите или измените данные книги</h3>
+<form class="book-edit-form" action="books.html">
+    <input type="hidden" id="id-input" name="id" th:value="${bookId}">
+    <div>
+        <label for="new-book-title" th:text="#{book-prompt-title}">Наименование книги:</label>
+        <input type="text" id="new-book-title" name="title">
+        <div hidden id="title-errors" class="errors"></div>
+    </div>
+    <div>
+        <label for="new-book-description" th:text="#{book-prompt-description}">Аннотация:</label>
+        <input type="text" id="new-book-description" name="description">
+        <div hidden id="description-errors" class="errors"></div>
+    </div>
+    <div>
+        <label for="new-book-author" th:text="#{book-prompt-author}">Автор:</label>
+        <select id="new-book-author" name="authorId">
+        </select>
+        <div hidden id="author-errors" class="errors"></div>
+    </div>
+    <div>
+        <label for="new-book-author" th:text="#{book-prompt-genres}">Жанры:</label>
+        <select id="new-book-genres" name="genreIds" multiple="multiple">
+        </select>
+        <div hidden id="genres-errors" class="errors"></div>
+    </div>
+    <div>
+        <button type="button" onclick="saveBook()" title="Принять" th:title="#{accept-button-title}"
+                class="book-table-button">
+            <img th:src="@{/images/accept-icon.png}" src="../static/images/accept-icon.png"/>
+        </button>
+        <a href="books.html" th:href="@{/book}">
+            <button type="button" title="Отменить" th:title="#{cancel-button-title}" class="book-table-button">
+                <img th:src="@{/images/cancel-icon.png}" src="../static/images/cancel-icon.png"/>
+            </button>
+        </a>
+    </div>
+</form>
+</body>
+</html>

@@ -1,10 +1,12 @@
 package ru.otus.spring.homework.oke.controller.data;
 
-import ru.otus.spring.homework.oke.dto.*;
+import ru.otus.spring.homework.oke.dto.AuthorFullNameDto;
+import ru.otus.spring.homework.oke.dto.BookResponseDto;
+import ru.otus.spring.homework.oke.dto.CommentRequestDto;
+import ru.otus.spring.homework.oke.dto.CommentResponseDto;
+import ru.otus.spring.homework.oke.dto.GenreResponseDto;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DataGenerator {
     public static AuthorFullNameDto getFirstAuthor() {

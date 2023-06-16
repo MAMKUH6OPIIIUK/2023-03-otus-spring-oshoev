@@ -102,7 +102,7 @@ public class CommentControllerTest {
     @Test
     void shouldUpdateCorrectComment() throws Exception {
         CommentResponseDto expectedComment = DataGenerator.getFirstCommentForFirstBook();
-        CommentRequestDto updatingComment = commentMapper.mapToCommentRequestDto(expectedComment, 1L);
+        CommentRequestDto updatingComment = commentMapper.mapToCommentRequestDto(expectedComment, null);
         String commentId = updatingComment.getId().toString();
 
         doNothing().when(commentService).update(any());
@@ -139,7 +139,7 @@ public class CommentControllerTest {
         doNothing().when(commentService).deleteById(any());
 
         mvc.perform(delete("/api/comment/" + commentId))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
         verify(commentService, times(1)).deleteById(commentId);
     }
 }

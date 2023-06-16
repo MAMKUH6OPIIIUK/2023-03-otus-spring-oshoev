@@ -3,10 +3,11 @@ package ru.otus.spring.homework.oke.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.spring.homework.oke.dto.BookUpdateDto;
 import ru.otus.spring.homework.oke.model.Author;
 import ru.otus.spring.homework.oke.model.Book;
 import ru.otus.spring.homework.oke.model.Genre;
-import ru.otus.spring.homework.oke.dto.BookRequestDto;
+import ru.otus.spring.homework.oke.dto.BookCreateDto;
 import ru.otus.spring.homework.oke.dto.BookResponseDto;
 import ru.otus.spring.homework.oke.exception.NotFoundException;
 import ru.otus.spring.homework.oke.mapper.BookMapper;
@@ -32,10 +33,10 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public BookResponseDto create(BookRequestDto bookRequestDto) {
-        Author bookAuthor = this.validateAuthor(bookRequestDto.getAuthorId());
-        Set<Genre> bookGenres = this.validateGenres(bookRequestDto.getGenreIds());
-        Book bookForCreate = bookMapper.mapToBook(bookRequestDto, bookAuthor, bookGenres);
+    public BookResponseDto create(BookCreateDto bookCreateDto) {
+        Author bookAuthor = this.validateAuthor(bookCreateDto.getAuthorId());
+        Set<Genre> bookGenres = this.validateGenres(bookCreateDto.getGenreIds());
+        Book bookForCreate = bookMapper.mapToBook(bookCreateDto, bookAuthor, bookGenres);
         Book createdBook = this.bookRepository.save(bookForCreate);
         BookResponseDto result = this.bookMapper.mapToBookResponseDto(createdBook);
         return result;
@@ -43,11 +44,11 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
-    public void update(BookRequestDto bookRequestDto) {
-        Book bookForUpdate = this.validateBook(bookRequestDto.getId());
-        Author newBookAuthor = this.validateAuthor(bookRequestDto.getAuthorId());
-        Set<Genre> newBookGenres = this.validateGenres(bookRequestDto.getGenreIds());
-        this.bookMapper.mergeBookInfo(bookForUpdate, bookRequestDto, newBookAuthor, newBookGenres);
+    public void update(BookUpdateDto bookUpdateDto) {
+        Book bookForUpdate = this.validateBook(bookUpdateDto.getId());
+        Author newBookAuthor = this.validateAuthor(bookUpdateDto.getAuthorId());
+        Set<Genre> newBookGenres = this.validateGenres(bookUpdateDto.getGenreIds());
+        this.bookMapper.mergeBookInfo(bookForUpdate, bookUpdateDto, newBookAuthor, newBookGenres);
         this.bookRepository.save(bookForUpdate);
     }
 

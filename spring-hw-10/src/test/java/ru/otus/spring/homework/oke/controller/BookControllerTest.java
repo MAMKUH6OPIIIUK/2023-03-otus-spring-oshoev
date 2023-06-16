@@ -11,8 +11,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.spring.homework.oke.controller.data.DataGenerator;
-import ru.otus.spring.homework.oke.dto.BookRequestDto;
+import ru.otus.spring.homework.oke.dto.BookCreateDto;
 import ru.otus.spring.homework.oke.dto.BookResponseDto;
+import ru.otus.spring.homework.oke.dto.BookUpdateDto;
 import ru.otus.spring.homework.oke.mapper.AuthorMapper;
 import ru.otus.spring.homework.oke.mapper.BookMapper;
 import ru.otus.spring.homework.oke.mapper.GenreMapper;
@@ -81,8 +82,7 @@ public class BookControllerTest {
     @Test
     void shouldCreateCorrectBook() throws Exception {
         BookResponseDto expectedBook = DataGenerator.getFirstBook();
-        BookRequestDto creatingBook = bookMapper.mapToBookRequestDto(expectedBook);
-        creatingBook.setId(null);
+        BookCreateDto creatingBook = bookMapper.mapToBookCreateDto(expectedBook);
 
         given(bookService.create(any())).willReturn(expectedBook);
 
@@ -97,8 +97,7 @@ public class BookControllerTest {
     @DisplayName("возвращать статус 400 и dto со списком ошибок при попытке создания некорректно заполненнной книги")
     @Test
     void shouldRejectInvalidBookCreate() throws Exception {
-        BookRequestDto creatingBook = bookMapper.mapToBookRequestDto(DataGenerator.getFirstBook());
-        creatingBook.setId(null);
+        BookCreateDto creatingBook = bookMapper.mapToBookCreateDto(DataGenerator.getFirstBook());
         creatingBook.setTitle("title".repeat(101));
 
         mvc.perform(post("/api/book")
@@ -113,7 +112,7 @@ public class BookControllerTest {
     @Test
     void shouldUpdateCorrectBook() throws Exception {
         BookResponseDto expectedBook = DataGenerator.getFirstBook();
-        BookRequestDto updatingBook = bookMapper.mapToBookRequestDto(expectedBook);
+        BookUpdateDto updatingBook = bookMapper.mapToBookUpdateDto(expectedBook);
         String bookId = updatingBook.getId().toString();
 
         doNothing().when(bookService).update(any());
@@ -129,7 +128,7 @@ public class BookControllerTest {
             "заголовка")
     @Test
     void shouldRejectInvalidBookUpdate() throws Exception {
-        BookRequestDto updatingBook = bookMapper.mapToBookRequestDto(DataGenerator.getFirstBook());
+        BookUpdateDto updatingBook = bookMapper.mapToBookUpdateDto(DataGenerator.getFirstBook());
         updatingBook.setTitle("title".repeat(101));
         String bookId = updatingBook.getId().toString();
 
@@ -149,7 +148,7 @@ public class BookControllerTest {
         doNothing().when(bookService).deleteById(any());
 
         mvc.perform(delete("/api/book/" + bookId))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
         verify(bookService, times(1)).deleteById(bookId);
     }
 }

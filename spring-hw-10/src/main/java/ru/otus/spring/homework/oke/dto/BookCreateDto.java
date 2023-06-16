@@ -6,15 +6,13 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
 import java.util.Collections;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class BookRequestDto {
-
-    private Long id;
-
+public class BookCreateDto {
     @NotBlank(message="{book-title-field-should-not-be-blank}")
     @Size(min = 1, max=500, message = "{book-title-field-should-has-expected-size}")
     private String title;
@@ -29,14 +27,7 @@ public class BookRequestDto {
     @NotEmpty(message = "{book-genres-field-should-not-be-empty}")
     private List<Long> genreIds;
 
-    public BookRequestDto() {
+    public BookCreateDto() {
         this.genreIds = Collections.EMPTY_LIST;
-    }
-
-    public BookRequestDto(String title, String description, Long authorId, List<Long> genreIds) {
-        this.title = title;
-        this.description = description;
-        this.authorId = authorId;
-        this.genreIds = genreIds;
     }
 }

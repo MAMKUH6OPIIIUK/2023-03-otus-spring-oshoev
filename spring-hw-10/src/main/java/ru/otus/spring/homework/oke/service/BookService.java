@@ -1,14 +1,15 @@
 package ru.otus.spring.homework.oke.service;
 
-import ru.otus.spring.homework.oke.dto.BookRequestDto;
+import ru.otus.spring.homework.oke.dto.BookCreateDto;
 import ru.otus.spring.homework.oke.dto.BookResponseDto;
+import ru.otus.spring.homework.oke.dto.BookUpdateDto;
 
 import java.util.List;
 
 public interface BookService {
-    BookResponseDto create(BookRequestDto bookRequestDto);
+    BookResponseDto create(BookCreateDto bookCreateDto);
 
-    void update(BookRequestDto bookRequestDto);
+    void update(BookUpdateDto bookUpdateDto);
 
     BookResponseDto findById(Long id);
 

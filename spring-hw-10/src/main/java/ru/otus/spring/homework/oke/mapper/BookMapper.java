@@ -3,8 +3,9 @@ package ru.otus.spring.homework.oke.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.otus.spring.homework.oke.dto.AuthorFullNameDto;
-import ru.otus.spring.homework.oke.dto.BookRequestDto;
+import ru.otus.spring.homework.oke.dto.BookCreateDto;
 import ru.otus.spring.homework.oke.dto.BookResponseDto;
+import ru.otus.spring.homework.oke.dto.BookUpdateDto;
 import ru.otus.spring.homework.oke.dto.GenreResponseDto;
 import ru.otus.spring.homework.oke.model.Author;
 import ru.otus.spring.homework.oke.model.Book;
@@ -20,17 +21,16 @@ public class BookMapper {
 
     private final GenreMapper genreMapper;
 
-    public Book mapToBook(BookRequestDto bookRequestDto, Author author, Set<Genre> genres) {
+    public Book mapToBook(BookCreateDto bookCreateDto, Author author, Set<Genre> genres) {
         Book book = new Book();
-        book.setId(bookRequestDto.getId());
-        book.setTitle(bookRequestDto.getTitle());
-        book.setDescription(bookRequestDto.getDescription());
+        book.setTitle(bookCreateDto.getTitle());
+        book.setDescription(bookCreateDto.getDescription());
         book.setAuthor(author);
         book.setGenres(genres);
         return book;
     }
 
-    public void mergeBookInfo(Book book, BookRequestDto bookRequestDto, Author newAuthor,
+    public void mergeBookInfo(Book book, BookUpdateDto bookRequestDto, Author newAuthor,
                               Set<Genre> newGenres) {
         book.setTitle(bookRequestDto.getTitle());
         book.setDescription(bookRequestDto.getDescription());
@@ -51,8 +51,19 @@ public class BookMapper {
         return dto;
     }
 
-    public BookRequestDto mapToBookRequestDto(BookResponseDto book) {
-        BookRequestDto dto = new BookRequestDto();
+    public BookCreateDto mapToBookCreateDto(BookResponseDto book) {
+        BookCreateDto dto = new BookCreateDto();
+        dto.setTitle(book.getTitle());
+        dto.setDescription(book.getDescription());
+        AuthorFullNameDto bookAuthor = book.getAuthor();
+        dto.setAuthorId(bookAuthor.getId());
+        List<GenreResponseDto> genres = book.getGenres();
+        dto.setGenreIds(genres.stream().map(GenreResponseDto::getId).toList());
+        return dto;
+    }
+
+    public BookUpdateDto mapToBookUpdateDto(BookResponseDto book) {
+        BookUpdateDto dto = new BookUpdateDto();
         dto.setId(book.getId());
         dto.setTitle(book.getTitle());
         dto.setDescription(book.getDescription());

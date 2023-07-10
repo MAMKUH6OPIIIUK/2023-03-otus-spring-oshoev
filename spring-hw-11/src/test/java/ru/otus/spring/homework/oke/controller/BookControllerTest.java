@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import ru.otus.spring.homework.oke.configuration.LocalizationConfig;
 import ru.otus.spring.homework.oke.controller.data.DataGenerator;
 import ru.otus.spring.homework.oke.dto.BookCreateDto;
 import ru.otus.spring.homework.oke.dto.BookResponseDto;
@@ -28,14 +29,15 @@ import ru.otus.spring.homework.oke.repository.CommentRepository;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @DisplayName("REST-контроллер для работы с книгами должен ")
 @WebFluxTest({BookController.class, ErrorsController.class})
-@Import({BookMapper.class, AuthorMapper.class, GenreMapper.class})
+@Import({BookMapper.class, AuthorMapper.class, GenreMapper.class, LocalizationConfig.class})
 public class BookControllerTest {
     private static final String TITLE_TOO_LONG_ERROR = "Поле заголовка книги должно содержать от 1 до 500 символов";
 

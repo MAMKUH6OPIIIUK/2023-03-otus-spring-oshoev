@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{library-site-title}">Библиотека</title>
+    <link rel="icon" th:href="@{/images/favicon.ico}" href="../static/images/favicon.ico"/>
+    <link rel="stylesheet" th:href="@{/styles/library.css}" href="../static/styles/library.css">
+    <!-- это объявляет локализованные константы для использования в JS -->
+    <script th:inline="javascript">
+        const viewButtonTitle = /*[[#{view-book-button-title}]]*/ "Посмотреть информацию о книге";
+        const editButtonTitle = /*[[#{edit-book-button-title}]]*/ "Редактировать книгу";
+        const deleteButtonTitle = /*[[#{delete-book-button-title}]]*/ "Удалить книгу";
+    </script>
+    <script type="text/javascript" th:src="@{/scripts/rest-client.js}" src="../static/scripts/rest-client.js"></script>
+    <script type="text/javascript" th:src="@{/scripts/books.js}" src="../static/scripts/books.js"></script>
+</head>
+<body onload="renderAllBooks()">
+<details class="lang-selector">
+    <summary><img th:src="@{/images/} + ${#locale} + '-icon.png'" src="../static/images/ru-icon.png" height="30"
+                  width="30"/></summary>
+    <ul>
+        <a href="#" th:href="@{/(lang=ru)}">
+            <li><img th:src="@{/images/ru-icon.png}" src="../static/images/ru-icon.png" height="25"
+                     width="25"/></li>
+        </a>
+        <a href="#" th:href="@{/(lang=en)}">
+            <li><img th:src="@{/images/en-icon.png}" src="../static/images/en-icon.png" height="25"
+                     width="25"/></li>
+        </a>
+    </ul>
+</details>
+<h3 class="book-header" th:text="#{book-list-header}">Книги</h3>
+<table class="library-table" id="library-table">
+    <thead>
+    <tr>
+        <th hidden th:text="#{book-field-id}">ID</th>
+        <th th:text="#{book-field-title}">Заголовок</th>
+        <th th:text="#{book-field-author}">Автор</th>
+        <th th:text="#{book-field-genres}">Жанры</th>
+        <th>
+            <button title="Добавить новую книгу" th:title="#{add-book-button-title}" class="book-table-button">
+                <a th:href="@{/book/create}">
+                    <img th:src="@{/images/add-icon.png}" src="../static/images/add-icon.png"/>
+                </a>
+            </button>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</body>
+</html>

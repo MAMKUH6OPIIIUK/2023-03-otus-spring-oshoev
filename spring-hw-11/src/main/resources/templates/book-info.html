@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{library-site-title}">Библиотека</title>
+    <link rel="icon" th:href="@{/images/favicon.ico}" href="../static/images/favicon.ico"/>
+    <link rel="stylesheet" th:href="@{/styles/library.css}" href="../static/styles/library.css">
+    <script th:inline="javascript">
+        const editButtonTitle = /*[[#{edit-comment-button-title}]]*/ "Редактировать комментарий";
+        const deleteButtonTitle = /*[[#{delete-comment-button-title}]]*/ "Удалить комментарий";
+        const acceptButtonTitle = /*[[#{accept-button-title}]]*/ "Принять";
+        const cancelButtonTitle = /*[[#{cancel-button-title}]]*/ "Отменить";
+    </script>
+    <script type="text/javascript" th:src="@{/scripts/rest-client.js}" src="../static/scripts/rest-client.js"></script>
+    <script type="text/javascript" th:src="@{/scripts/book-info.js}" src="../static/scripts/book-info.js"></script>
+</head>
+<body onload="renderBookInfoFormData()">
+<a href="books.html" th:href="@{/book}">
+    <button type="button" title="Назад к списку книг" th:title="#{to-books-button-title}" class="book-table-button">
+        <img th:src="@{/images/return-icon.png}" src="../static/images/return-icon.png" height="30"
+             width="30" align="middle"/>
+    </button>
+</a>
+<h3 class="book-header" id="book-title">Название книги</h3>
+<div>
+    <p hidden id="id-input" th:text="${bookId}"></p>
+    <p id="book-author">Василий Васильевич Пупкин</p>
+    <p id="book-description">Описание книги</p>
+</div>
+<h4 class="comments" th:text="#{comment-list-header}">Комментарии к книге:</h4>
+<table class="library-table" id="comments-table">
+    <thead>
+    <tr>
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<p></p>
+<form id="new-comment-form" action="book-info.html">
+    <div>
+        <label for="new-comment-text" th:text="#{comment-prompt-text}">Ваше мнение о книге:</label>
+        <textarea id="new-comment-text" name="text" class="comment-text-area"></textarea>
+        <div hidden id="text-errors" class="errors">Некорректный текст комментария</div>
+    </div>
+    <div>
+        <button type="button" onclick="saveComment()" title="Принять" th:title="#{accept-button-title}"
+                class="book-form-button">
+            <img th:src="@{/images/accept-icon.png}" src="../static/images/accept-icon.png"/>
+        </button>
+        <button type="button" onclick="cancelCommentEdit()" title="Отменить" th:title="#{cancel-button-title}"
+                class="book-form-button">
+            <img th:src="@{/images/cancel-icon.png}" src="../static/images/cancel-icon.png"/>
+        </button>
+    </div>
+</form>
+</body>
+</html>

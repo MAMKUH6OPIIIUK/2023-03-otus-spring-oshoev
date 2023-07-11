@@ -1,0 +1,12 @@
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: oshoev-k-library-reactive
+      auto-index-creation: true
+mongock:
+  enabled: true
+logging:
+  level:
+    root: ERROR

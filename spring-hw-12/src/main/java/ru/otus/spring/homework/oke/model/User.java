@@ -21,10 +21,13 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "users")
-public class ApplicationUser implements UserDetails {
+public class User implements UserDetails {
     @Id
-    @Column(name = "username", nullable = false, length = 50)
-    private String username;
+    @Column(name = "user_id", nullable = false)
+    private Long id;
+
+    @Column(name = "login", nullable = false, length = 50, unique = true)
+    private String login;
 
     @Column(name = "password", nullable = false, length = 500)
     private String password;
@@ -33,8 +36,13 @@ public class ApplicationUser implements UserDetails {
     private boolean enabled;
 
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "username")
-    private Set<ApplicationAuthority> authorities;
+    @JoinColumn(name = "user_id")
+    private Set<Authority> authorities;
+
+    @Override
+    public String getUsername() {
+        return this.login;
+    }
 
     @Override
     public boolean isAccountNonExpired() {

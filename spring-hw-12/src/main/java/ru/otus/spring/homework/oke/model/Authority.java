@@ -15,9 +15,9 @@ import org.springframework.security.core.GrantedAuthority;
 @Setter
 @Entity
 @Table(name = "authorities")
-public class ApplicationAuthority implements GrantedAuthority {
+public class Authority implements GrantedAuthority {
     @EmbeddedId
-    private ApplicationAuthorityId id;
+    private AuthorityId id;
 
     @Override
     public String getAuthority() {

@@ -12,9 +12,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ApplicationAuthorityId {
-    @Column(name = "username", nullable = false, length = 50)
-    private String username;
+public class AuthorityId {
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @Column(name = "authority", nullable = false, length = 50)
     private String authority;

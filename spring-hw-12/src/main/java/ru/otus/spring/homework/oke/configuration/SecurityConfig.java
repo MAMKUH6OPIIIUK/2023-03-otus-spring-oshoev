@@ -33,5 +33,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new MessageDigestPasswordEncoder("MD5");
     }
-
 }

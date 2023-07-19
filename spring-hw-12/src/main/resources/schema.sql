@@ -1,25 +1,26 @@
 CREATE TABLE IF NOT EXISTS users
 (
-    username varchar_ignorecase(50) NOT NULL PRIMARY KEY,
+    user_id bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    login varchar_ignorecase(50) NOT NULL UNIQUE,
     password varchar_ignorecase(500) NOT NULL,
     enabled boolean NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS authorities
 (
-    username varchar_ignorecase(50) NOT NULL,
+    user_id bigint NOT NULL,
     authority varchar_ignorecase(50) NOT NULL,
-    CONSTRAINT fk_authorities_users FOREIGN KEY (username)
-        REFERENCES users(username)
+    CONSTRAINT fk_authorities_users FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
 );
-CREATE UNIQUE INDEX IF NOT EXISTS ix_auth_username on authorities (username,authority);
+CREATE UNIQUE INDEX IF NOT EXISTS ix_auth_username on authorities (user_id,authority);
 
 
 CREATE TABLE IF NOT EXISTS genres
 (
-    id bigint NOT NULL AUTO_INCREMENT,
+    genre_id bigint NOT NULL AUTO_INCREMENT,
     name character varying(500) NOT NULL UNIQUE,
-    CONSTRAINT genre_pkey PRIMARY KEY (id)
+    CONSTRAINT genre_pkey PRIMARY KEY (genre_id)
 );
 COMMENT ON TABLE genres
     IS 'Таблица жанров';
@@ -61,7 +62,7 @@ CREATE TABLE IF NOT EXISTS books_genres
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
     CONSTRAINT fk_books_genres_genre FOREIGN KEY (genre_id)
-        REFERENCES genres (id)
+        REFERENCES genres (genre_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );

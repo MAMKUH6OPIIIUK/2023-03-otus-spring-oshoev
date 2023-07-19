@@ -1,20 +1,21 @@
-insert into users(username, password, enabled) values ('admin', '{UIb2+jsw61Pl8qy63B0gkSk9fMAaH0mYlBNrXHbSY74=}b5c28313d02d89b0d83b55d72f7925d7', 1);
-insert into users(username, password, enabled) values ('user', '{UIb2+jsw61Pl8qy63B0gkSk9fMAaH0mYlBNrXHbSY74=}b5c28313d02d89b0d83b55d72f7925d7', 1);
+insert into users(user_id, login, password, enabled) values (1, 'admin', '{UIb2+jsw61Pl8qy63B0gkSk9fMAaH0mYlBNrXHbSY74=}b5c28313d02d89b0d83b55d72f7925d7', 1);
+insert into users(user_id, login, password, enabled) values (2, 'user', '{UIb2+jsw61Pl8qy63B0gkSk9fMAaH0mYlBNrXHbSY74=}b5c28313d02d89b0d83b55d72f7925d7', 1);
+alter table users alter column user_id restart with 3;
 
-insert into authorities(username, authority) values ('admin', 'USER');
-insert into authorities(username, authority) values ('admin', 'ADMIN');
-insert into authorities(username, authority) values ('user', 'USER');
+insert into authorities(user_id, authority) values (1, 'USER');
+insert into authorities(user_id, authority) values (1, 'ADMIN');
+insert into authorities(user_id, authority) values (2, 'USER');
 
 
 insert into authors(id, name, middle_name, patronymic, surname) values (1, 'Джон', 'Рональд Руэл', null, 'Толкин');
 insert into authors(id, name, middle_name, patronymic, surname) values (2, 'Михаил', null, 'Александрович', 'Рапов');
 alter table authors alter column id restart with 3;
 
-insert into genres(id, name) values (1, 'Фэнтези');
-insert into genres(id, name) values (2, 'Приключенческая художественная литература');
-insert into genres(id, name) values (3, 'Историческая проза');
-insert into genres(id, name) values (4, 'Мистика');
-alter table genres alter column id restart with 5;
+insert into genres(genre_id, name) values (1, 'Фэнтези');
+insert into genres(genre_id, name) values (2, 'Приключенческая художественная литература');
+insert into genres(genre_id, name) values (3, 'Историческая проза');
+insert into genres(genre_id, name) values (4, 'Мистика');
+alter table genres alter column genre_id restart with 5;
 
 insert into books(id, title, description, author_id)
 values (1,

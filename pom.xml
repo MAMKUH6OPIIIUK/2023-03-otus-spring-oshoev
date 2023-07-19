@@ -36,6 +36,7 @@
         <module>spring-hw-09</module>
         <module>spring-hw-10</module>
         <module>spring-hw-11</module>
+        <module>spring-hw-12</module>
     </modules>
     <!-- дополняем существующее управление версиями зависимостей из spring-boot-parent -->
     <dependencyManagement>

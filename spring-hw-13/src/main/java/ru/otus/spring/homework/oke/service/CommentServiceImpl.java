@@ -111,7 +111,6 @@ public class CommentServiceImpl implements CommentService {
         MutableAcl acl = mutableAclService.createAcl(oid);
         acl.setOwner(owner);
         acl.insertAce(acl.getEntries().size(), BasePermission.WRITE, owner, true);
-        acl.insertAce(acl.getEntries().size(), BasePermission.DELETE, owner, true);
         mutableAclService.updateAcl(acl);
     }
 }

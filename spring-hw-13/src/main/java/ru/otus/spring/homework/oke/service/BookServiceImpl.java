@@ -14,7 +14,6 @@ import ru.otus.spring.homework.oke.repository.AuthorRepository;
 import ru.otus.spring.homework.oke.repository.BookRepository;
 import ru.otus.spring.homework.oke.repository.GenreRepository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,14 +62,10 @@ public class BookServiceImpl implements BookService {
     @Transactional(readOnly = true)
     public List<BookResponseDto> findAll() {
         List<Book> foundBooks = this.bookRepository.findAll();
-        if (foundBooks.isEmpty()) {
-            return Collections.EMPTY_LIST;
-        }
-        List<BookResponseDto> result = foundBooks
+        return foundBooks
                 .stream()
                 .map(bookMapper::mapToBookResponseDto)
                 .collect(Collectors.toList());
-        return result;
     }
 
     @Override
@@ -115,9 +110,6 @@ public class BookServiceImpl implements BookService {
      *                           найден жанр
      */
     private Set<Genre> validateGenres(List<Long> genreIds) {
-        if (genreIds == null || genreIds.isEmpty()) {
-            return Collections.EMPTY_SET;
-        }
         Set<Genre> foundGenres = this.genreRepository.findByIdIn(genreIds);
         int foundCount = foundGenres.size();
         int requiredCount = genreIds.size();

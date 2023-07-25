@@ -7,7 +7,6 @@ import ru.otus.spring.homework.oke.dto.AuthorFullNameDto;
 import ru.otus.spring.homework.oke.repository.AuthorRepository;
 import ru.otus.spring.homework.oke.repository.BookRepository;
 import ru.otus.spring.homework.oke.model.Author;
-import ru.otus.spring.homework.oke.model.Book;
 import ru.otus.spring.homework.oke.dto.AuthorRequestDto;
 import ru.otus.spring.homework.oke.exception.NotFoundException;
 import ru.otus.spring.homework.oke.mapper.AuthorMapper;
@@ -51,8 +50,8 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     @Transactional
     public void deleteById(Long id) {
-        List<Book> authorBooks = this.bookRepository.findByAuthorId(id);
-        if (authorBooks.size() != 0) {
+        long authorBooksCount = this.bookRepository.countByAuthorId(id);
+        if (authorBooksCount != 0) {
             throw new NotFoundException("Найдены книги данного автора. Сначала удалите их");
         }
         this.authorRepository.deleteById(id);

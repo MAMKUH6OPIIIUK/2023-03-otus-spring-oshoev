@@ -26,7 +26,7 @@ public class BookRequestDto {
 
     @Positive(message = "{book-author-field-should-be-positive}")
     private Long authorId;
-
+    
     @NotEmpty(message = "{book-genres-field-should-not-be-empty}")
     private List<Long> genreIds;
 

@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    List<Book> findByAuthorId(Long authorId);
+    long countByAuthorId(Long authorId);
 
     @Override
     @EntityGraph(value = "book-author-entity-graph")

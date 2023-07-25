@@ -1,7 +1,6 @@
 package ru.otus.spring.homework.oke.configuration;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
@@ -32,10 +31,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AclConfig {
     @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
-    @Autowired
     private final DataSource dataSource;
 
-    @Autowired
     private final JCacheCacheManager cacheManager;
 
     @Bean

@@ -45,7 +45,7 @@ public class AuthorMigrationStepConfig {
     @Bean
     public JpaPagingItemReader<Author> authorReader() {
         return new JpaPagingItemReaderBuilder<Author>()
-                .name("genreItemReader")
+                .name("authorItemReader")
                 .entityManagerFactory(entityManagerFactory)
                 .queryString("select a from Author a order by a.id")
                 .build();

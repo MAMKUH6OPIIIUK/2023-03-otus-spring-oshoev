@@ -46,7 +46,7 @@ public class CommentMigrationStepConfig {
     @Bean
     public JpaPagingItemReader<Comment> commentReader() {
         return new JpaPagingItemReaderBuilder<Comment>()
-                .name("bookItemReader")
+                .name("commentItemReader")
                 .entityManagerFactory(entityManagerFactory)
                 .queryString("select c from Comment c order by c.id")
                 .build();

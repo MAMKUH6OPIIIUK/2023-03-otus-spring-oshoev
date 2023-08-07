@@ -30,7 +30,7 @@ import ru.otus.spring.homework.oke.processor.BookItemProcessor;
 @Configuration
 @RequiredArgsConstructor
 public class BookMigrationStepConfig {
-    public static final String STEP_NAME = "booksMigrationStep";
+    public static final String STEP_NAME = "booksWithGenresMigrationStep";
 
     private static final int CHUNK_SIZE = 5;
 
@@ -45,7 +45,7 @@ public class BookMigrationStepConfig {
     @Bean
     public JpaPagingItemReader<Book> bookReader() {
         return new JpaPagingItemReaderBuilder<Book>()
-                .name("bookItemReader")
+                .name("bookWithGenresItemReader")
                 .entityManagerFactory(entityManagerFactory)
                 .queryString("select b from Book b order by b.id")
                 .build();

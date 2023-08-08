@@ -1,0 +1,47 @@
+spring:
+  main:
+    allow-circular-references: true
+  batch:
+    job:
+      enabled: false
+  shell:
+    interactive:
+      enabled: false
+    noninteractive:
+      enabled: false
+    command:
+      version:
+        enabled: false
+  data:
+    mongodb:
+      host: localhost
+      port: 0
+      database: oshoev-k-library-test
+      auto-index-creation: true
+  datasource:
+    url: jdbc:h2:mem:library
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  sql:
+    init:
+      mode: always
+      data-locations: data.sql
+      schema-locations: schema.sql
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+    show-sql: true
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 4.0.2

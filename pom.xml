@@ -40,6 +40,7 @@
         <module>spring-hw-11</module>
         <module>spring-hw-12</module>
         <module>spring-hw-13</module>
+        <module>spring-hw-14</module>
     </modules>
     <!-- дополняем существующее управление версиями зависимостей из spring-boot-parent -->
     <dependencyManagement>

@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: "library-application"
+  data:
+    rest:
+      basePath: /datarest/api
+  messages:
+    encoding: UTF-8
+  datasource:
+    url: jdbc:h2:mem:library;MODE=LEGACY;
+  sql:
+    init:
+      mode: always
+      #data-locations: data.sql
+      #schema-locations: schema.sql
+  h2:
+    console:
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+    show-sql: false
+  # pretty-print actuator responses in browser
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+management:
+  endpoints:
+    web:
+      # change base path from default "actuator" to monitor
+      base-path: /monitor
+      exposure:
+        include: metrics,health,logfile
+    # for pretty-print
+    jackson:
+      isolated-object-mapper: false
+  endpoint:
+    health:
+      # display health checks with details
+      show-details: when-authorized
+    logfile:
+      external-file: ${logging.file.name}
+  # enable all default health check
+  health:
+    defaults:
+      enabled: true
+logging:
+  file:
+    name: ./logs/library-log.log
+  level:
+    root: INFO
+    org:
+      hibernate:
+        SQL: DEBUG

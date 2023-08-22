@@ -26,6 +26,7 @@
         <jcache.api.version>1.1.1</jcache.api.version>
         <ehcache-core.version>3.1.3</ehcache-core.version>
         <apache.commons.version>3.12.0</apache.commons.version>
+        <spring-cloud.version>2022.0.3</spring-cloud.version>
     </properties>
     <modules>
         <module>spring-hw-01</module>
@@ -44,6 +45,7 @@
         <module>spring-hw-14</module>
         <module>spring-hw-15</module>
         <module>spring-hw-16</module>
+        <module>spring-hw-17</module>
     </modules>
     <!-- дополняем существующее управление версиями зависимостей из spring-boot-parent -->
     <dependencyManagement>
@@ -102,6 +104,13 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${apache.commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

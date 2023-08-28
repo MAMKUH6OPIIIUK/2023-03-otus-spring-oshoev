@@ -46,6 +46,7 @@
         <module>spring-hw-15</module>
         <module>spring-hw-16</module>
         <module>spring-hw-17</module>
+        <module>spring-hw-18</module>
     </modules>
     <!-- дополняем существующее управление версиями зависимостей из spring-boot-parent -->
     <dependencyManagement>

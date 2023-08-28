@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{library-site-title}">Библиотека</title>
+    <link rel="icon" th:href="@{/images/favicon.ico}" href="../static/images/favicon.ico"/>
+    <link rel="stylesheet" th:href="@{/styles/library.css}" href="../static/styles/library.css">
+</head>
+<body th:object="${book}">
+<a href="books.html" th:href="@{/book}">
+    <button type="button" title="Назад к списку книг" th:title="#{to-books-button-title}" class="book-table-button">
+        <img th:src="@{/images/return-icon.png}" src="../static/images/return-icon.png" height="30"
+             width="30" align="middle"/>
+    </button>
+</a>
+<h3 class="book-header" th:text="*{title}">Название книги</h3>
+<div>
+    <p th:text="*{author.fullName}">
+        Василий Васильевич Пупкин</p>
+    <p th:text="*{description}">Описание книги</p>
+</div>
+<h4 class="comments" th:text="#{comment-list-header}">Комментарии к книге:</h4>
+<table class="library-table">
+    <thead>
+    <tr>
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="comment : ${comments}">
+        <td hidden th:text="${comment.id}">1</td>
+        <td th:if="${comment.id} ne ${editingComment.id}">
+            <pre th:text="${comment.text}" class="comment-pre">Текст комментария</pre>
+        </td>
+        <td th:if="${comment.id} eq ${editingComment.id}">
+            <form action="book-info.html" th:action="@{/comment/edit}" th:method="post" th:object="${editingComment}">
+                <div>
+                    <input type="hidden" name="id" th:value="${editingComment.id}"/>
+                    <textarea name="text" th:text="${editingComment.text}"
+                              class="comment-text-area">Текст комментария</textarea>
+                    <div class="errors" th:if="${#fields.hasErrors('text')}" th:errors="*{text}">Некорректный текст
+                        комментария
+                    </div>
+                    <input type="hidden" name="bookId" th:value="${book.id}"/>
+                    <button type="submit" title="Принять" th:title="#{accept-button-title}" class="book-table-button">
+                        <img th:src="@{/images/accept-icon.png}" src="../static/images/accept-icon.png" height="25"
+                             width="25" align="middle"/>
+                    </button>
+                    <a href="book-info.html" th:href="@{/book/{id}(id=${book.id})}">
+                        <button type="button" title="Отменить" th:title="#{cancel-button-title}"
+                                class="book-table-button">
+                            <img th:src="@{/images/cancel-icon.png}" src="../static/images/cancel-icon.png" height="25"
+                                 width="25" align="middle"/>
+                        </button>
+                    </a>
+                </div>
+            </form>
+        </td>
+        <td></td>
+    </tr>
+    </tbody>
+</table>
+<p></p>
+</body>
+</html>

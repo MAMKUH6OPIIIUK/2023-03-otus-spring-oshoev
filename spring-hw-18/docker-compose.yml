@@ -1,0 +1,23 @@
+version: '3'
+services:
+  library-app:
+    container_name: library-app-oshoev
+    image: library-app-oshoev:1.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://library-db:5432/library
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+  library-db:
+    container_name: library-db-oshoev
+    image: "postgres:13.12-bullseye"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=library

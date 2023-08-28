@@ -1,0 +1,89 @@
+spring:
+  application:
+    name: "library-application"
+  data:
+    rest:
+      basePath: /datarest/api
+  messages:
+    encoding: UTF-8
+  datasource:
+    url: jdbc:postgresql://localhost:5432/library
+    username: postgres
+    password: postgres
+  liquibase:
+    enabled: true
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+    show-sql: false
+  # pretty-print actuator responses in browser
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+management:
+  endpoints:
+    web:
+      # change base path from default "actuator" to monitor
+      base-path: /monitor
+      exposure:
+        include: metrics,health
+    # for pretty-print
+    jackson:
+      isolated-object-mapper: false
+  endpoint:
+    health:
+      # display health checks with details
+      show-details: when-authorized
+  # enable all default health check
+  health:
+    defaults:
+      enabled: true
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+logging:
+#  file:
+#    name: ./logs/library-log.log
+  level:
+    root: INFO
+    org:
+      hibernate:
+        SQL: DEBUG
+    io:
+      github:
+        resilience4j: DEBUG
+resilience4j.circuitbreaker:
+  metrics:
+    enabled: true
+  configs:
+    default:
+      registerHealthIndicator: true
+      allowHealthIndicatorToFail: true
+      minimumNumberOfCalls: 10
+      slidingWindowType: COUNT_BASED
+      slidingWindowSize: 10
+      failureRateThreshold: 60
+      slowCallDurationThreshold: 3000
+      slowCallRateThreshold: 90
+      permittedNumberOfCallsInHalfOpenState: 5
+      waitDurationInOpenState: 10000
+  instances:
+    default-business-method:
+      baseConfig: default
+      ignoreExceptions:
+        - ru.otus.spring.homework.oke.exception.NotFoundException
+    long-running-business-method:
+      baseConfig: default
+      slowCallDurationThreshold: 15000
+      slowCallRateThreshold: 100
+      ignoreExceptions:
+        - ru.otus.spring.homework.oke.exception.NotFoundException
+    security-service:
+      baseConfig: default
+      ignoreExceptions:
+        - org.springframework.security.core.userdetails.UsernameNotFoundException

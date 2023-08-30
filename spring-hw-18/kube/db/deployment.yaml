@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: library-db-oshoev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: library-db-oshoev
+  template:
+    metadata:
+      labels:
+        app: library-db-oshoev
+    spec:
+      containers:
+        - image: postgres:13.12-bullseye
+          name: library-db-oshoev
+          ports:
+            - containerPort: 5432
+              name: "postgres"
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres
+            - name: POSTGRES_DB
+              value: library
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: "2"

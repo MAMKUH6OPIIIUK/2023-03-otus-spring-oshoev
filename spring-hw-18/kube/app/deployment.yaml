@@ -1,0 +1,28 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: library-web-oshoev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: library-web-oshoev
+  template:
+    metadata:
+      labels:
+        app: library-web-oshoev
+    spec:
+      containers:
+        - image: library-app-oshoev:1.0
+          name: library-app-oshoev
+          ports:
+            - containerPort: 8080
+              name: "http"
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://$(LIBRARY_DB_OSHOEV_SERVICE_SERVICE_HOST)/library
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: postgres
